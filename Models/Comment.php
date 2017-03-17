@@ -45,6 +45,36 @@ class Comment {
       		return new Comment($comment['id'],$comment['contenu'],$comment['photo_id'],$comment['user_login']);
 	}
 
+	public static function create($comment)
+	{
+
+		$sql = "INSERT INTO commentaires (contenu,photo_id,user_login) VALUES (:contenu,:photo_id,:owner)";
+
+		$data = array('contenu'  => $comment['contenu'],
+					  'photo_id' => $comment['photo_id'],
+					  'owner'    => $comment['owner']);
+
+		Request::execute($sql,$data);
+
+	}
+
+
+	public static function update(string $content,$id)
+	{
+
+		$id = intval($id);
+
+		$sql = "UPDATE commentaires SET contenu=$content WHERE id=$id";
+
+		Request::execute($sql);
+	}
+	public static function delete($id) {
+
+		$sql = "DELETE FROM commentaires WHERE id=$id";
+
+		Request::execute($sql);
+	}
+
 
 
 }
