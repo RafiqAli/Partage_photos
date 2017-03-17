@@ -5,9 +5,15 @@ require_once("core/Helpers.php");
 
 class Upload {
 
-	const MAX_SIZE ="150000"; 
+	const MAX_SIZE ="10000000"; 
 
-	const TARGET = "/home/ali/partage_photos";
+	const TARGET = "/home/ali/partage_photos/";
+
+	const LOCAL_TARGET = "public/ressources/users/";
+
+	const MAX_NAME_SIZE = 255;
+     
+    private static $user_file_name;
      
     private static $file_name; 
     
@@ -22,6 +28,8 @@ class Upload {
     private static $file_errors; 
      
     private static $directory; 
+
+    private static $errors =  array('failed' => false, 'error' => "" );
 
 
     private static $allowed_types=array(
@@ -122,172 +130,204 @@ class Upload {
 								        );
 
 
-    private static function generate_name($file) 
-    {
-    	$allowed = false;
-    	$error = "";
-        if(is_uploaded_file($file['tmp_name'])) 
-        { 
-	    	self::$file_tmp = $file['tmp_name'];
-	    	$radical = Helpers::RandomString();
-	    	$type =  explode('.', $file['name'])[1];
-	        self::$file_name = $radical.'.'.$type; 
-	        self::$file_full_name = self::TARGET . self::$directory.'/'.self::$file_name;
-    	} else $error = "File is not uploaded properly please try again";
 
-        return array('allowed' => $allowed, 'name' => self::$file_name, 'error' => $error ); 
-    } 
-
-    private static function is_allowed_type($filetype,string $category) 
-    { 
-         
-    	$allowed = false;
-    	$error = "";
-        if(in_array($filetype , self::$allowed_types[$category])) 
-        { 
-        	$allowed = true;
-            self::$file_type = $filetype; 
-        } 
-        else $error = 'File Type Is Not An Allowed Type Please Only Upload Files that are Allowed Types'; 
-        
-        return array('allowed' => $allowed, 'type' => self::$file_type, 'error' => $error ); 
-    } 
-     
-    private static function is_allowed_size($filesize) 
-    { 
-
-    	$allowed = false;
-    	$error = "";
-
-        if($filesize < self::MAX_SIZE) 
-        { 
-            self::$file_size = $filesize; 
-        } 
-         
-        elseif($filesize > self::MAX_SIZE ) 
-        { 
-            $error = 'Error file size is to large'; 
-        } 
-         
-        return array('allowed' => $allowed, 'size' => self::$file_size, 'error' => $error );  
-    } 
-
-
-     
-    private static function upload_dir($destination) 
-    { 
-    	$allowed = false;
-    	$error = "";
-
-        if($destination == 'photos' && file_exists('photos')) 
-        { 
-            self::$directory = '/photos'; 
-        } 
-         
-        elseif($destination != 'photos' && file_exists($destination)) 
-        { 
-            self::$directory = $destination; 
-        } 
-         
-        elseif($destination !='defualt' && !file_exists($destination)) 
-        { 
-            $error = 'Fatal Upload Error Directory Does not Exsist'; 
-        } 
-         
-        return array('allowed' => $allowed, 'directory' => self::$directory, 'error' => $error );  
-         
-    } 
-     
-
-	public static function check_upload($errors)
+	public static function pre_check_upload($file_error)
 	{
-		
 		$failed = false;
 		$error = '';
-
-		if ($errors)
+		if ($file_error)
 		{
 			$failed = true;
 			switch ($errors)
 			{
-
-		    case UPLOAD_ERR_INI_SIZE:
-	           	$error = "Le fichier depasse la limite autorisee par le serveur (fichier php.ini).";
-	           	break;
-	        case UPLOAD_ERR_FORM_SIZE:
-	           	$error = "Le fichier depasse la limite autorisee dans le formulaire HTML.";
-	           	break;
-	        case UPLOAD_ERR_PARTIAL:
-	           	$error = "L'envoi du fichier a ete interrompu pendant le transfert.";
-	          	break;
-	        case UPLOAD_ERR_NO_FILE:
-	           	$error = "Le fichier que vous avez envoye a une taille nulle.";
-	         	break;
-		 	case UPLOAD_ERR_NO_TMP_DIR:
-		 		$error = "Pas de repertoire temporaire defini.";
-		 		break;
-		 	case UPLOAD_ERR_CANT_WRITE:
-		 		$error = "Ecriture du fichier impossible.";
-		 	default:
-				$error = "Erreur inconnue.";
+		    case UPLOAD_ERR_INI_SIZE:   $error = "File exeeds the limit allowed by the server (file php.ini).";
+	        case UPLOAD_ERR_FORM_SIZE:  $error = "File exeeds the limit allowed by HTML form.";
+	        case UPLOAD_ERR_PARTIAL:    $error = "The transfert of file has been disconnected.";
+	        case UPLOAD_ERR_NO_FILE:    $error = "File size is null.";
+		 	case UPLOAD_ERR_NO_TMP_DIR: $error = "No temporary directory has been set.";
+		 	case UPLOAD_ERR_CANT_WRITE: $error = "Can't write on file.";
+		 	default: $error = "Unknown error.";
 			}
 		}
 
 		return  array( 'failed' => $failed, 'error' => $error );
 	}
 
+    private static function generate_name($file) 
+    {
 
-	 public static function upload_file($file) {
+	    	self::$file_tmp = $file['tmp_name'];
+	    	$radical = Helpers::RandomString();
+	    	$type =  explode('/', $file['type'])[1];
+	        self::$file_name = $radical.'.'.$type; 
+	        self::$file_full_name = self::TARGET . self::$directory.'/'.self::$file_name;
 
-	 	$errors = self::check_upload($file['error']);
+	        echo "full name " . self::$file_full_name . "<br>";
+    
+    } 
 
-	 	if ($errors['failed'] == false)
+    private static function is_allowed_type($filetype,string $category) 
+    { 
+         
+    	$failed = false;
+    	$error = "";
+        if(in_array($filetype , self::$allowed_types[$category])) 
+        { 
+        	
+            self::$file_type = $filetype; 
+        } 
+        else
+        {
+        	$failed = true;
+        	$error = 'File type is not an allowed type please only upload files that are allowed types : '. implode(",",$allowed_types['image']); 
+        }
+
+        return array('failed' => $failed, 'type' => self::$file_type, 'error' => $error ); 
+    } 
+     
+    private static function is_allowed_size($filesize) 
+    { 
+    	$failed = false;
+    	$error = "";
+
+        if($filesize < self::MAX_SIZE) self::$file_size = $filesize;
+        else
+        {	
+        	 $failed = true;
+        	 $error  = 'Error file size is too large'; 
+       	}
+        return array('failed' => $failed, 'size' => self::$file_size, 'error' => $error );  
+    } 
+
+
+     
+    private static function upload_dir($destination) 
+    { 
+
+    	$failed = false;
+    	$error = "";
+
+    	if(file_exists(self::LOCAL_TARGET.$destination))
+    	{
+    		self::$directory = self::LOCAL_TARGET . $destination;
+
+    	}
+		else
+		{
+
+			if (mkdir(self::LOCAL_TARGET . $destination))
+	        { 
+	        	self::$directory = self::LOCAL_TARGET.$destination.'/';
+	        }
+	        else
+	        {
+	        	$failed = true; 
+	         	$error  = 'Could not create directory for file storage'; 
+	        }
+		}
+
+        return array('failed' => $failed, 'directory' => self::$directory, 'error' => $error );          
+    } 
+   
+
+	 public static function format_user_file_name($file)
+	 {
+	 	$name   = "";
+	 	$failed = false;
+	 	$error  = "";
+
+	 	if(isset($file['name']) && $file['name'] != null)
 	 	{
 
-	 		$allowed_type = self::is_allowed_type($file['type'],"image");
-
-	 		$allowed_size = self::is_allowed_size($file['size']);
-
-	 		$upload_dir = self::upload_dir('photos');
-
-	 		$file_name = self::generate_name($file);
-
-	 		if ($allowed_type['allowed'] == false) 
+	 		if(strlen($file['name']) < self::MAX_NAME_SIZE)
 	 		{
-	 			$errors['failed'] = true;
-	 			$errors['error']  = $allowed_type['error'];
-	 		}			 
-			if ($allowed_size['allowed'] == false) 
-			{
-				$errors['failed'] = true;
-				$errors['error'] = $allowed_size['error'];
-			}
-			if ($upload_dir['allowed'] == false) 
-			{
-				$errors['failed'] = true;
-				$errors['error'] = $upload_dir['error'];
-			}
-			if($file_name['allowed'] == false) 
-			{
-				$errors['failed'] = true;
-				$errors['error'] = $upload_dir['error'];
-			}
 
-			if ($errors != null)
-			{
-				 move_uploaded_file(self::$file_tmp ,self::$file_full_name); 
-				 return true;
-			}
+	 			$name = addslashes($file['name']);
+	 			$name = htmlspecialchars($name);
+	 			self::$user_file_name = $name;
 
-			else return $errors;   
+	 		} 
+	 		else 
+	 		{
+	 			$failed = true;
+	 			$error  = "file exeeds name bounds : 255 characters.";
+	 		}
 
-	 	
-	 	} else return $errors;
+	 	} 
+	 	else
+	 	{
+	 		$failed = true;
+	 		$error  = "file name is not set or null";
+	 	}
 
+	 	return array('failed' => $failed, 'name' => $name, 'error' => $error);
 	 }
 
 
-	 public static function get_file_name()
+	 public static function upload_file($file,$owner) {
+
+	 	$pre_check_upload = self::pre_check_upload($file['error']);
+
+	 	if ($pre_check_upload['failed'] == false)
+	 	{
+	 		
+	 		$upload_dir = self::upload_dir($owner);
+
+	 		$allowed_size = self::is_allowed_size($file['size']);
+
+	 		$user_file_name = self::format_user_file_name($file);
+
+		 	$allowed_type = self::is_allowed_type($file['type'],'image');
+
+		 	var_dump($allowed_type);
+
+	 		if ($user_file_name['failed'] == true) 
+	 		{
+	 			self::$errors['failed'] = $user_file_name['failed'];
+	 			self::$errors['error']  = $user_file_name['error'];
+	 		}	 		
+
+	 		if ($allowed_type['failed'] == true) 
+	 		{
+	 			self::$errors['failed'] = $allowed_type['failed'];
+	 			self::$errors['error']  = $allowed_type['error'];
+	 		}			 
+			if ($allowed_size['failed'] == true) 
+			{
+				self::$errors['failed'] = $allowed_size['failed'];
+				self::$errors['error']  = $allowed_size['error'];
+			}
+			if ($upload_dir['failed'] == true) 
+			{
+				self::$errors['failed'] = $upload_dir['failed'];
+				self::$errors['error']  = $upload_dir['error'];
+			}
+
+			if (self::$errors['failed'] == false)
+			{
+
+				 self::generate_name($file);
+				 move_uploaded_file(self::$file_tmp ,self::$file_full_name); 
+				 
+				 return self::$errors;
+			
+			} else return self::$errors;   
+	 	
+	 	} else
+	 	  {
+	 	  	 self::$errors['failed'] = pre_check_upload['error'];
+	 	  	 self::$errors['error'] = pre_check_upload['error'];
+	 	  	 return self::$errors;
+	 	  }
+	 }
+
+
+	 public static function get_user_file_name() {
+
+	 	return self::$user_file_name;
+	 }
+
+	 public static function get_generated_file_name()
 	 {
 	 	return self::$file_name;
 	 }
@@ -296,6 +336,7 @@ class Upload {
 	 {
 	 	return self::$directory.'/'.self::$file_name;
 	 }
+
 	
 
 }
