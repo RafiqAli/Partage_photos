@@ -1,7 +1,9 @@
 <?php 
 
-require_once("../enable_errors.php");
-require_once("../Request.php");
+//require_once("../core/enable_errors.php");
+require_once("core/Request.php");
+//require_once("../core/boite_outils.php");
+require_once("Upload.php");
 
 class Photo {
 
@@ -73,6 +75,49 @@ class Photo {
 
       		return new Photo($photo['id'],$photo['nom'],$photo['date'],$photo['description'],$photo['user_login']);
 	  }
+
+
+	  public static function create($photo,$file)
+	  {
+
+	  	if(isset($photo['nom'])         &&  $photo['nom']         != null 
+		&& isset($photo['date'])        &&  $photo['date']        != null
+		&& isset($photo['description']) &&  $photo['description'] != null
+		&& isset($photo['owner'])	    &&  $photo['owner']       != null)
+	  	{
+
+	  			if(isset($file['file_upload']) && $file['file_upload'] != null)
+	  			{
+
+				  		$output = Upload::upload_file($file['file_upload'],$photo['owner']);
+
+				  		if($output['failed'] == false)
+				  		{
+
+				  			$sql = "INSERT INTO photos (nom,date,description,fichier,user_login) VALUES (:nom,:date,:description,:fichier,:owner)";
+
+				  			$data = array(':nom'         => Upload::get_user_file_name(),
+					  					  ':date'        => $photo['date'],
+					  					  ':description' => $photo['description'],
+					  					  ':fichier'     => Upload::get_generated_file_name(),
+					  					  ':owner'       => $photo['owner']);
+
+				  			Request::execute($sql,$data);
+
+				  			return array('output' => $output, 'target' => Upload::get_target_name());
+
+				  		} else return array('output' => $output, 'target' => Upload::get_target_name());
+
+
+				} else return "file identifier not found or null";
+
+			} else {
+
+				return "some values are not set or have null values";
+			}
+		 
+	  }
+
 }
 
 ?>
