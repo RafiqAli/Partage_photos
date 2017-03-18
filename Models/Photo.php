@@ -1,29 +1,31 @@
 <?php 
 
-//require_once("../core/enable_errors.php");
 require_once("core/Request.php");
-//require_once("../core/boite_outils.php");
 require_once("Upload.php");
+require_once("core/Regex.php");
+require_once("Comment.php");
 
 class Photo {
 
 
 	  public $owner;
 	  public $id;
-	  public $nom;
+	  public $name;
 	  public $date;
+	  public $file;
 	  public $description;
 
 
 
-	  private function __construct($id,$nom,$date,$description,$owner) {
+	  public function __construct($id,$title,$name,$date,$description,$file,$owner) {
 
 	  		$this->id = $id;
-	  		$this->nom = $nom;
+	  		$this->title = $title;
+	  		$this->name = $name;
 	  		$this->date = $date;
 	  		$this->description = $description;
+	  		$this->file = $file;
 	  		$this->owner = $owner;
-
 	  }
 
 
@@ -31,14 +33,25 @@ class Photo {
 
 	  	$list = [];
 
-	  	$sql = "SELECT * FROM photos";
+		$sql = "SELECT * FROM photos";
 
-	  	foreach (Request::execute($sql) as $photo) {
-	  		
-	  		$list[] = new Photo($photo['id'],$photo['nom'],$photo['date'],$photo['description'],$photo['user_login']);
-	  	}
+		$output = Request::execute($sql);
 
-	  	return $list;
+		if($output != null)
+		{
+
+		  	foreach ($output as $photo) {
+		  		
+		  		$list[] = new Photo($photo['id'],$photo['title'],$photo['name'],$photo['date'],$photo['description'],$photo['file'],$photo['owner']);
+		  	}
+
+		  	return  array('failed' => false, 'objects' => $list, 'error' => '');
+	    }
+	    else
+	    {
+	    	return array('failed' => true, 'error' => 'coudn\'t find photos on database');
+	    } 
+
 	  }
 
 
@@ -46,41 +59,68 @@ class Photo {
 
 	  	$list_comments = [];
 
-	  	$sql = "SELECT c.id,c.contenu,c.photo_id,c.user_login FROM commentaires c,photos p WHERE c.photo_id = p.id";
+	  	$sql = "SELECT c.id,c.content,c.photo_id,c.owner FROM comments c  INNER JOIN photos p ON c.photo_id = p.id HAVING c.photo_id = '".$this->id."' ;";
 
 	  	$comments = Request::execute($sql);
 
+	  	if($comments != null)
+	  	{
 
-	  	foreach ($comments as $comment) {
-	  	
+		  	foreach ($comments as $comment) {
+		  	
 
-	  		$list_comments = new Comment($comment['id'],$comment['contenu'],$comment['photo_id'],$comment['user_login']);
+		  		$list_comments[] = new Comment($comment['id'],$comment['content'],$comment['photo_id'],$comment['owner']);
+
+		  	}
+
+		  	return array('failed' => false, 'objects' => $list_comments, 'error' => '');
 
 	  	}
-
-	  	return $list_comments;
+	  	else
+	  	{
+	  		return array('failed' => true, 'error' => 'no comment has been posted on this with photo.');
+	  	}
 
 	  }
 
-	  
-
+	 
 	  public static function find($id) {
 
-	  		// we make sure $id is an integer
-      		$id = intval($id);
+	  		
+      		if(Regex::validate(Regex::DIGITS,$id))
+      		{
 
-      		$sql = "SELECT * FROM photos WHERE id=".$id;
+	      		$sql = "SELECT * FROM photos WHERE id=".$id;
 
-      		$photo = Request::execute($sql);
+	      		$photo = Request::execute($sql);
 
-      		return new Photo($photo['id'],$photo['nom'],$photo['date'],$photo['description'],$photo['user_login']);
+	      		if($photo != null)
+	      		{
+
+	      			$photo = $photo[0];
+
+		      		$photo_instance = new Photo($photo['id'],$photo['title'],$photo['name'],$photo['date'],$photo['description'],$photo['file'],$photo['owner']);
+
+		      		return array('failed' => false, 'object' => $photo_instance, 'error' => '');
+
+	      		}
+	      		else
+	      		{
+	      			return array('failed' => true, 'error' => 'we couldn\'t find a picture with this id value');
+	      		}
+
+	      	}
+	      	else
+	      	{
+	      		return array('failed' => true, 'error' => 'please enter a numeric value for the id');
+	      	}
 	  }
 
 
 	  public static function create($photo,$file)
 	  {
 
-	  	if(isset($photo['nom'])         &&  $photo['nom']         != null 
+	  	if(isset($photo['title'])       &&  $photo['title']       != null 
 		&& isset($photo['date'])        &&  $photo['date']        != null
 		&& isset($photo['description']) &&  $photo['description'] != null
 		&& isset($photo['owner'])	    &&  $photo['owner']       != null)
@@ -89,34 +129,146 @@ class Photo {
 	  			if(isset($file['file_upload']) && $file['file_upload'] != null)
 	  			{
 
-				  		$output = Upload::upload_file($file['file_upload'],$photo['owner']);
+				  		$upload_output = Upload::upload_file($file['file_upload'],$photo['owner']);
 
-				  		if($output['failed'] == false)
+				  		if($upload_output['failed'] == false)
 				  		{
 
-				  			$sql = "INSERT INTO photos (nom,date,description,fichier,user_login) VALUES (:nom,:date,:description,:fichier,:owner)";
+				  			$sql = "INSERT INTO photos (title,name,date,description,file,owner) VALUES (:title,:name,:date,:description,:file,:owner)";
 
-				  			$data = array(':nom'         => Upload::get_user_file_name(),
-					  					  ':date'        => $photo['date'],
-					  					  ':description' => $photo['description'],
-					  					  ':fichier'     => Upload::get_generated_file_name(),
-					  					  ':owner'       => $photo['owner']);
+				  			$data = array(':title'        => $photo['title'],
+				  						  ':name'         => Upload::get_user_file_name(),
+					  					  ':date'         => $photo['date'],
+					  					  ':description'  => $photo['description'],
+					  					  ':file'         => Upload::get_generated_file_name(),
+					  					  ':owner'        => $photo['owner']);
 
 				  			Request::execute($sql,$data);
 
-				  			return array('output' => $output, 'target' => Upload::get_target_name());
+				  			$target = Upload::get_target_name();
 
-				  		} else return array('output' => $output, 'target' => Upload::get_target_name());
+				  			Upload::close();
+
+				  			$upload_output += array( 'target' => $target);
+
+				  			return $upload_output;
+
+				  		} 
+				  		else
+				  		{
+				  			return $upload_output;	
+				  		} 
 
 
-				} else return "file identifier not found or null";
+				}
+				else
+				{
+					return array('failed' => true, 'error' =>"file identifier not found or null");	
+				} 
 
-			} else {
-
-				return "some values are not set or have null values";
+			}
+			else
+			{
+				return array('failed' => true, 'error' => "some values are not set or have null values");
 			}
 		 
 	  }
+
+	  public static function update_photo($photo)
+	  {
+
+	  		$output = Upload::upload_file($photo['file'],$photo['owner']);
+
+	  		if($output['failed'] == false)
+	  		{
+	  			$sql = "UPDATE photos SET name=".Upload::get_user_file_name()." file=".Upload::get_generated_file_name()."WHERE id=".$this->id;
+	  			Request::execute($sql);
+
+	  			Upload::close();
+
+	  			return array('failed' => false, 'error' => "");
+	  		}
+	  		else
+	  		{
+	  			Upload::close();
+	  			return array('failed' => true, 'error' => 'could not delete picture from the server, try again later');
+	  		}
+	  }
+
+	  public function update_title(string $photo_title)
+	  {
+
+	  	if(Regex::validate(Regex::TEXT,$photo_title))
+	  	{
+	  		$sql = "UPDATE photos SET title = '".$photo_title."' WHERE id = ".$this->id.";";
+
+	  		Request::query($sql);
+
+	  		return array('failed' => false, 'error' => '');
+	  	}
+	  	else
+	  	{
+	  		return array('failed' => true, 'error' => 'please make sure that you did enter a valid name');
+	  	}
+
+	  }
+
+	  public function update_description(string $photo_description)
+	  {
+
+	  	if(Regex::validate(Regex::RICHTEXT,$photo_description))
+	  	{
+	  		$sql = "UPDATE photos SET description='".$photo_description."' WHERE id=".$this->id;
+
+	  		Request::query($sql);
+
+	  		return array('failed' => false, 'error' => '');
+	  	}
+	  	else
+	  	{
+	  		return array('failed' => true, 'error' => 'please make sure that you did enter a valid description');
+	  	}
+
+	  }
+
+
+
+	  public static function delete($id)
+	  {
+
+	  		$photo = self::find($id);
+
+	  		if(!$photo['failed'])
+	  		{
+		  		$is_deleted = unlink(Upload::LOCAL_TARGET.$photo->owner.'/'.$photo->file);
+
+		  		if($is_deleted)
+		  		{
+		  			$sql = "DELETE FROM photos WHERE id=".$photo->id;
+
+		  			Request::query($sql);
+
+		  			return array('failed' => false, 'error' => '');
+
+		  		}
+		  		else
+		  		{
+		  			return array('failed' => true, 'error' => "could not delete image");
+		  		}
+		  	}
+		  	else
+		  	{
+		  		return $photo;
+		  	}
+
+	  }
+
+
+	  public function __toString()
+	  {
+
+	  	return 'Photo : [id] : '.$this->id.' [title] : '.$this->title.' [name] : '.$this->name.' [date] : '.$this->date.' [description] : '.$this->description.' [file] : '.$this->file.'  [owner] : '.$this->owner;
+	  } 
 
 }
 

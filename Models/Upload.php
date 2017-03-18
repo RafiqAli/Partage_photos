@@ -322,6 +322,28 @@ class Upload {
 	 }
 
 
+	 public static function close() {
+
+		 self::$user_file_name = "";
+	     
+	     self::$file_name = ""; 
+	    
+	     self::$file_full_name = "";
+
+	     self::$file_type = ""; 
+	     
+	     self::$file_size = ""; 
+	     
+	     self::$file_tmp = ""; 
+	     
+	     self::$file_errors = ""; 
+	     
+	     self::$directory = ""; 
+
+	     self::$errors = array('failed' => false, 'error' =>'');
+
+	 }
+
 	 public static function get_user_file_name() {
 
 	 	return self::$user_file_name;
@@ -336,8 +358,6 @@ class Upload {
 	 {
 	 	return self::$directory.'/'.self::$file_name;
 	 }
-
-	
 
 }
 
