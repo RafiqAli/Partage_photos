@@ -79,13 +79,25 @@ class Comment {
 	public static function create($comment)
 	{
 
-		$sql = "INSERT INTO comments (content,photo_id,owner) VALUES (:content,:photo_id,:owner)";
 
-		$data = array('content'  => $comment['content'],
-					  'photo_id' => $comment['photo_id'],
-					  'owner'    => $comment['owner']);
+		if(isset($photo['content'])   &&  $photo['content']   != null 
+		&& isset($photo['photo_id'])  &&  $photo['photo_id']  != null
+		&& isset($photo['owner'])     &&  $photo['owner']     != null)
+		{
+			$sql = "INSERT INTO comments (content,photo_id,owner) VALUES (:content,:photo_id,:owner)";
 
-		Request::execute($sql,$data);
+			$data = array('content'  => $comment['content'],
+						  'photo_id' => $comment['photo_id'],
+						  'owner'    => $comment['owner']);
+
+			Request::execute($sql,$data);
+
+			return array('failed' => false, 'error' => '');
+		}
+		else
+		{
+			return array('failed' => true, 'error' =>  "some values are not set or have null values");
+		}
 
 	}
 
