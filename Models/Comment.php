@@ -1,8 +1,8 @@
 <?php 
 
-require_once("core/enable_errors.php");
-require_once("core/Request.php");
-require_once("core/Regex.php");
+require_once("../core/enable_errors.php");
+require_once("../core/Request.php");
+require_once("../core/Regex.php");
 
 class Comment {
 

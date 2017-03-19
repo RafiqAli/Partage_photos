@@ -1,6 +1,6 @@
 <?php 
 
-require_once("core/Helpers.php");
+require_once("../core/Helpers.php");
 
 
 class Upload {
@@ -315,8 +315,8 @@ class Upload {
 	 	
 	 	} else
 	 	  {
-	 	  	 self::$errors['failed'] = pre_check_upload['error'];
-	 	  	 self::$errors['error'] = pre_check_upload['error'];
+	 	  	 self::$errors['failed'] = $pre_check_upload['error'];
+	 	  	 self::$errors['error'] = $pre_check_upload['error'];
 	 	  	 return self::$errors;
 	 	  }
 	 }

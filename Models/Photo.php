@@ -1,8 +1,8 @@
 <?php 
 
-require_once("core/Request.php");
+require_once("../core/Request.php");
 require_once("Upload.php");
-require_once("core/Regex.php");
+require_once("../core/Regex.php");
 require_once("Comment.php");
 
 class Photo {
@@ -213,6 +213,24 @@ class Photo {
 
 	  }
 
+	  public function update_date(string $photo_date)
+	  {
+
+	  	if(!is_null($photo_date))
+	  	{
+	  		$sql = "UPDATE photos SET date = '".$photo_date."' WHERE id = ".$this->id.";";
+
+	  		Request::query($sql);
+
+	  		return array('failed' => false, 'error' => '');
+	  	}
+	  	else
+	  	{
+	  		return array('failed' => true, 'error' => 'please make sure that you did enter a valid date');
+	  	}
+
+	  }
+
 	  public function update_description(string $photo_description)
 	  {
 
@@ -230,7 +248,6 @@ class Photo {
 	  	}
 
 	  }
-
 
 
 	  public static function delete($id)

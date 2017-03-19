@@ -1,8 +1,8 @@
 <?php 
 
-require_once("core/enable_errors.php");
-require_once("core/Request.php");
-require_once("core/Regex.php");
+require_once("../core/enable_errors.php");
+require_once("../core/Request.php");
+require_once("../core/Regex.php");
 require_once("Upload.php");
 require_once("Photo.php");
 
@@ -85,7 +85,7 @@ class User {
 
 			$sql = "SELECT * FROM users WHERE login='".$u['login']."' AND password='".$password."';";
 
-			$user = Request::execute($sql);
+			$user = Request::execute($sql,null,false);
 
 			if($user != null)
 			{
