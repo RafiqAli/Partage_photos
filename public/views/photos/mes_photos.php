@@ -16,7 +16,7 @@
 
 
     <div class="row">  
-    <legend>Gallerie de photos</legend>
+    <legend>Photos de <?php echo $_SESSION['user']['username']; ?></legend>
     </div>
 
 
@@ -42,16 +42,9 @@ if (isset($images))
         <p><?php echo $image->description; ?></p>
         <p>
 
-          <a 
-           <?php echo 'href="?controller=photos&action=affiche_photo&id='.$image->id.'"';  ?>
-
-          class="btn btn-primary" role="button"><span class="fa fa-eye" aria-hidden="true"></span></a>
-          <?php if ($_SESSION['user']['username'] == $image->owner): ?>
-            <a 
-            <?php echo 'href="?controller=photos&action=modif_photo&id='.$image->id.'"';  ?>
-
-             class="btn btn-default" role="button"><span class="glyphicon glyphicon-pencil"></span></a>
-          <?php endif ?>
+          <a <?php echo 'href="?controller=photos&action=affiche_photo&id='.$image->id.'"';  ?>class="btn btn-primary" role="button"><span class="fa fa-eye" aria-hidden="true"></span></a>
+          <a <?php echo 'href="?controller=photos&action=modif_photo&id='.$image->id.'"';  ?>
+           class="btn btn-default" role="button"><span class="glyphicon glyphicon-pencil"></span></a>
 
         </p>
       </div>
