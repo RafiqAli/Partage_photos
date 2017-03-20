@@ -116,6 +116,40 @@ class Photo {
 	      	}
 	  }
 
+	  public static function search($mot_cle) {
+
+		$list_photos = [];
+
+		if(Regex::validate(Regex::RICHTEXT,$mot_cle))
+		{
+
+  		$sql = "SELECT * FROM photos WHERE title LIKE '%".$mot_cle."%' OR description LIKE '%".$mot_cle."%' ORDER BY title ASC";
+
+  		$photos = Request::execute($sql);
+
+  		if($photos != null)
+  		{
+
+			foreach ($photos as $photo)
+			{
+				$list_photos[] = new Photo($photo['id'],$photo['title'],$photo['name'],$photo['date'],$photo['description'],$photo['file'],$photo['owner']);
+			}
+
+			return array('failed' => false,'objects' => $list_photos, 'error' => '');
+
+  		}
+  		else
+  		{
+  			return array('failed' => true, 'error' => 'Aucune photo ne correspond a votre recherche');
+  		}
+
+  	}
+  	else
+  	{
+  		return array('failed' => true, 'error' => 'Veillez entrez un texte de recherche valide');
+  	}
+		
+	}
 
 	  public static function create($photo,$file)
 	  {

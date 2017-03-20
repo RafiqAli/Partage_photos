@@ -5,14 +5,15 @@ require_once("../core/Helpers.php");
 
 class Upload {
 
+
 	const MAX_SIZE ="10000000"; 
 
-	const TARGET = "/home/ali/partage_photos/";
-
-	const LOCAL_TARGET = "public/ressources/users/";
+	const LOCAL_TARGET = "public/res/users/";
 
 	const MAX_NAME_SIZE = 255;
      
+    private static $target;
+
     private static $user_file_name;
      
     private static $file_name; 
@@ -155,12 +156,12 @@ class Upload {
 
     private static function generate_name($file) 
     {
-
+    		$target = $_SERVER['DOCUMENT_ROOT']."/Partage_photos/";
 	    	self::$file_tmp = $file['tmp_name'];
 	    	$radical = Helpers::RandomString();
 	    	$type =  explode('/', $file['type'])[1];
 	        self::$file_name = $radical.'.'.$type; 
-	        self::$file_full_name = self::TARGET . self::$directory.'/'.self::$file_name;
+	        self::$file_full_name = self::$target . self::$directory.'/'.self::$file_name;
 
 	        echo "full name " . self::$file_full_name . "<br>";
     
@@ -206,23 +207,24 @@ class Upload {
 
     	$failed = false;
     	$error = "";
+    	$target = $_SERVER['DOCUMENT_ROOT']."/Partage_photos/".self::LOCAL_TARGET . $destination;
 
-    	if(file_exists(self::LOCAL_TARGET.$destination))
+    	if(file_exists($target))
     	{
-    		self::$directory = self::LOCAL_TARGET . $destination;
+    		self::$directory = $target;
 
     	}
 		else
 		{
 
-			if (mkdir(self::LOCAL_TARGET . $destination))
+			if (mkdir($target))
 	        { 
-	        	self::$directory = self::LOCAL_TARGET.$destination.'/';
+	        	$target.'/';
 	        }
 	        else
 	        {
 	        	$failed = true; 
-	         	$error  = 'Could not create directory for file storage'; 
+	         	$error  = 'Could not create directory for file storage in --> '.$target; 
 	        }
 		}
 

@@ -114,8 +114,9 @@ class User {
 
 		$list_photos = [];
 
-		$sql = "SELECT p.id,p.title,p.name,p.date,p.description,p.file,p.owner 
-				FROM photos p,users u WHERE p.owner = '".$this->login."' ;";
+		$sql = "SELECT id, title, name, date, description, file, owner 
+				FROM photos WHERE owner = '".$this->login."' ;";
+
 
 		$photos = Request::execute($sql);
 
