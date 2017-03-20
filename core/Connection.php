@@ -8,7 +8,7 @@ class Connection {
     private static $_host      = "localhost";
     private static $_dsn       = "";
     private static $_user      = "root";
-    private static $_password  = "secret";
+    private static $_password  = "";
 
     private static $connection;
 
@@ -23,6 +23,7 @@ class Connection {
 	    if(!self::isConnected()) self::connect();
 
 	    return self::$connection;
+        echo "string";
     }
 
 
