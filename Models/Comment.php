@@ -80,15 +80,15 @@ class Comment {
 	{
 
 
-		if(isset($photo['content'])   &&  $photo['content']   != null 
-		&& isset($photo['photo_id'])  &&  $photo['photo_id']  != null
-		&& isset($photo['owner'])     &&  $photo['owner']     != null)
+		if(isset($comment->content)   &&  $comment->content   != null 
+		&& isset($comment->photo_id)  &&  $comment->photo_id  != null
+		&& isset($comment->owner)     &&  $comment->owner     != null)
 		{
 			$sql = "INSERT INTO comments (content,photo_id,owner) VALUES (:content,:photo_id,:owner)";
 
-			$data = array('content'  => $comment['content'],
-						  'photo_id' => $comment['photo_id'],
-						  'owner'    => $comment['owner']);
+			$data = array('content'  => $comment->content,
+						  'photo_id' => $comment->photo_id,
+						  'owner'    => $comment->owner);
 
 			Request::execute($sql,$data);
 
