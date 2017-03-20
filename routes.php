@@ -19,7 +19,14 @@
         // we need the model to query the database later in the controller
         require_once('Models/Photo.php');
         require_once('Models/User.php');
+        require_once('Models/Comment.php');
+
         $controller = new PhotosController();
+      break;
+
+      case 'friends':
+
+        $controller = new FriendsController();
       break;
     }
 
@@ -27,8 +34,17 @@
   }
 
   // we're adding an entry for the new controller and its actions
-  $controllers = array('pages' => ['home', 'login', 'register', 'logout', 'error'],
-                        'photos' => ['show_all', 'mes_photos', 'affiche_photo', 'modif_photo']
+  $controllers = array( 'pages'   => ['home',
+                                      'login',
+                                      'register',
+                                      'logout',
+                                      'error'],
+                        'photos'  => ['ajout_photo',
+                                      'mes_photos',
+                                      'affiche_photo',
+                                      'modif_photo',
+                                      'cherche_photo'],
+                        'friends' => ['friends_groups']
                        );
 
   if (array_key_exists($controller, $controllers))
