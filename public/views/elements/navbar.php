@@ -14,11 +14,11 @@
             <ul class="nav navbar-form navbar-nav navbar-right">
                 <li class="navbar-form">
                      <form method="post"  
-                     action="?controller=photos&action=search_photo"
+                     action="?controller=photos&action=cherche_photo"
 >
                     <div class="form-group">
-                        <input type="text" class="input-sm" placeholder="Rechercher" name="words_to_search">
-                        <input type="submit" name="submit_recherche" class="btn btn-primary btn-sm" />
+                        <input type="text" class="input-sm" placeholder="Rechercher" name="mot_cle">
+                        <input type="submit" name="submit_recherche" class="btn btn-primary btn-sm" value="chercher" />
                     </div>
                     </form>
                 </li>        
@@ -54,6 +54,22 @@
             <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav side-nav">
+                    
+                    <?php if (isset($_GET['action']) && $_GET['action'] == 'mes_photos'){ ?>
+
+                    <li class="">
+                        <a href="?controller=pages&action=home"><i class="fa fa-fw fa-home"></i> Acceuil</a>
+                    </li>
+                    <li class="active">
+                        <a href="?controller=photos&action=mes_photos"><i class="fa fa-fw fa-camera"></i> Mes photos</a>
+                    </li>
+                    <li>
+                        <a href="?controller=friends&action=friends_groups"><i class="fa fa-fw fa-users"></i> Groupes d'amis</a>
+                    </li> 
+
+                    <?php } elseif (isset($_GET['action']) && $_GET['action'] == 'home'){ ?>
+
+
                     <li class="active">
                         <a href="?controller=pages&action=home"><i class="fa fa-fw fa-home"></i> Acceuil</a>
                     </li>
@@ -61,6 +77,21 @@
                         <a href="?controller=photos&action=mes_photos"><i class="fa fa-fw fa-camera"></i> Mes photos</a>
                     </li>
                     <li>
-                        <a href="?controller=friends&action=showall"><i class="fa fa-fw fa-users"></i> Groupes d'amis</a>
-                    </li>                                      
+                        <a href="?controller=friends&action=friends_groups"><i class="fa fa-fw fa-users"></i> Groupes d'amis</a>
+                    </li> 
+
+                    <?php }else { ?>
+
+                    <li class="">
+                        <a href="?controller=pages&action=home"><i class="fa fa-fw fa-home"></i> Acceuil</a>
+                    </li>
+                    <li>
+                        <a href="?controller=photos&action=mes_photos"><i class="fa fa-fw fa-camera"></i> Mes photos</a>
+                    </li>
+                    <li class="active">
+                        <a href="?controller=friends&action=friends_groups"><i class="fa fa-fw fa-users"></i> Groupes d'amis</a>
+                    </li> 
+
+                    <?php } ?>
+                                     
         </nav>

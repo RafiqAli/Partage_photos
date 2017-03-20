@@ -36,9 +36,7 @@
       <?php require_once('views/elements/messages.php'); ?>  
     </div>
 
-    <footer>
-            <?php  include_once("./views/elements/footer.php"); ?>
-    </footer>
+    <?php  include_once("./views/elements/footer.php"); ?>
 
 </div>
       <!-- jQuery -->
