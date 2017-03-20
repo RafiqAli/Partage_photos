@@ -13,15 +13,17 @@
             <!-- Top Menu Items -->
             <ul class="nav navbar-form navbar-nav navbar-right">
                 <li class="navbar-form">
-                     <form>
+                     <form method="post"  
+                     action="?controller=photos&action=search_photo"
+>
                     <div class="form-group">
-                        <input type="text" class="input-sm" placeholder="Search">
-                        <button type="submit" class="btn btn-primary btn-sm">Submit</button>
+                        <input type="text" class="input-sm" placeholder="Rechercher" name="words_to_search">
+                        <input type="submit" name="submit_recherche" class="btn btn-primary btn-sm" />
                     </div>
                     </form>
                 </li>        
                 <li class="dropdown navbar-form">
-                    <button class="btn btn-primary btn-sm" href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i>
+                    <button class="btn btn-primary btn-sm" href="#" class="dropdown-togglfe" data-toggle="dropdown"><i class="fa fa-user"></i>
                                 <?php if(isset($_SESSION['user']['username'])) 
                                         {
                                             echo $_SESSION['user']['username'];  

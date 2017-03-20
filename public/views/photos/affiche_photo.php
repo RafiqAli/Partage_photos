@@ -28,7 +28,7 @@
  
                    <div class="x_content">
                     <br />
-                    <form class="form-horizontal form-label-left" novalidate>
+                    <form class="form-horizontal form-label-left">
 
                       <div class="item form-group">
                         <strong class="col-md-3 col-sm-3 col-xs-12" for="date">Date:

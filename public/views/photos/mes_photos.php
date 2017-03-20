@@ -1,5 +1,23 @@
 <div id="page-wrapper">
 
+<div class="well">
+<div class="col-md-offset-10">
+<!-- Example split danger button -->
+<div class="btn-group">
+  <button type="button" class="btn btn-sm btn-info">Tri par : </button>
+  <button type="button" class="btn btn-sm btn-info dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <span class=""><span class="fa fa-caret-down"></span>
+  </button>
+  <div class="dropdown-menu">
+    <button type="button" class="btn btn-block" href="#">Nom</button>
+    <button type="button" class="btn btn-block" href="#">Propriétaire</button>
+    <button type="button" class="btn btn-block" href="#">Date</button>
+    <button type="button" class="btn btn-block" href="#">Description</button>
+  </div>
+</div>
+</div>
+</div>
+
 <div class="well text-center">
     <div class="row">  
       <div class="col-md-8 col-md-offset-2"><button data-toggle="collapse" data-target="#afficher_form_ajout" type="button" class="btn btn-primary btn-lg btn-block">Ajouter une photo</button></div>

@@ -24,14 +24,15 @@
 
   <body>
 
-<br><br>
+<br><br><br><br>
 <div class="container-fluid">
+
 
      <div class="container-fluid col-xs-offset-2">
         <?php require_once('../routes.php'); ?> 
     </div>
-    <br>
-    <div class="col-md-6 col-md-offset-4 modal-fade" data-backdrop="static" style="z-index: 100; top: 30%; left:auto; width:50%; position: fixed;">
+
+    <div class="col-xs-6 col-xs-offset-4 modal-fade" data-backdrop="static" style="z-index: 100; top: 12%; left:auto; width:50%; position: fixed;">
       <?php require_once('views/elements/messages.php'); ?>  
     </div>
 
