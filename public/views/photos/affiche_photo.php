@@ -85,24 +85,33 @@
   </div><!-- /thumbnail -->
   </div><!-- /col-sm-1 -->
 
+  <form method="post">
+
   <div class="col-md-10">
   <div class="panel panel-info">
   <div class="panel-heading">
   <strong><?php echo $_SESSION['user']['username']; ?></strong> <span class="text-muted"></span>
   </div>
-  <textarea class="panel-body responsive col-md-12" placeholder="Ajouter un commentaire..."></textarea><!-- /panel-body -->
 
-  <div class="clearfix">
-    
-  </div>
+  <textarea class="panel-body responsive col-md-12" placeholder="Ajouter un commentaire..." id="content_comment"></textarea><!-- /panel-body -->
+
+  <div class="clearfix"></div>
+
+  <input type="hidden" id="photo_id" value="<?php echo $photo->id; ?>">
+  <input type="hidden" id="photo_owner" value="<?php echo $photo->owner; ?>">
+
 
   </div><!-- /panel panel-default -->
+
   <div class="form-group pull-left">
     <div class="col-md-6">
-      <a href="#" class="btn btn-success">Ajouter</a>
+      <button type="button" onclick="AjaxFunction2()" class="btn btn-success">Ajouter</button>
     </div>
   </div> 
+
   </div><!-- /col-sm-5 -->
+
+  </form>
 
   </div><!-- /row -->
 
@@ -111,11 +120,13 @@
 
 <!-- All comments -->
 
+<div id="all_comments">
+
 <?php if (isset($comments)): ?>
 
 <?php foreach ($comments as $comment): ?>
   
-   <div class="well text-center">
+  <div class="well text-center">
 
   <div class="row text-left">
   <div class="col-md-1">
@@ -142,4 +153,55 @@
 
 <?php endif ?>
 
+
 </div>
+
+</div>
+
+
+
+
+<script>
+function AjaxFunction2() {
+
+  var content_comment = document.getElementById("content_comment").value;
+  var photo_id = document.getElementById("photo_id").value;
+  var photo_owner = document.getElementById("photo_owner").value;
+
+  
+if(content_comment != "")
+{
+
+  //le DOM qui va recevoir la requete
+  var targetId = 'all_comments';
+  //fichier php qui traite la requete
+  var url = "/Partage_photos/controllers/ajax_comment.php";
+  //parametres a envoyer
+
+  var params = "content_comment="+content_comment+"&photo_id="+photo_id+"&photo_owner="+photo_owner;
+
+    if (window.XMLHttpRequest) {
+      // code for IE7+, Firefox, Chrome, Opera, Safari
+        xmlhttp = new XMLHttpRequest();
+    } else {
+        // code for IE6, IE5
+        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+
+
+    xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+                document.getElementById(targetId).innerHTML = this.responseText;
+        }
+    };
+
+    //for get you put the params inside the url and call send() empty;
+    xmlhttp.open("POST", url, true);
+    //Send the proper header information along with the request
+  xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xmlhttp.send(params);
+}
+
+}
+
+</script>

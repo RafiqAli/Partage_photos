@@ -2,17 +2,18 @@
           <!-- Page Heading -->
 <div class="well text-center">
 
+
+
+<div class="row">  
+<legend>Resultats de recherche</legend>
+</div>
+
+
  <?php 
 if (isset($images)) 
 {
   foreach ($images as $image ) {
 ?>
-
-
-    <div class="row">  
-    <legend>Resultats de recherche</legend>
-    </div>
-
 
 <div class="row">
 
