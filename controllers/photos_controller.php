@@ -2,6 +2,35 @@
   class PhotosController 
   {
 
+    public function ajout_photo()
+    {
+      
+      if (isset($_POST['submit_addphoto']))
+      {
+
+        $result = Photo::create($_POST, $_FILES);
+  
+        if ($result['failed']) 
+        {
+          $_SESSION['error'] = $result['error'];
+          require_once('../public/views/elements/navbar.php');
+          require_once('views/pages/home.php'); 
+        }
+        else
+        {
+          $_SESSION['success'] = "Photo ajoute avec succes";
+          $this->mes_photos();       
+        }
+
+        }
+        else
+        {
+          require_once('../public/views/elements/navbar.php');
+          require_once('views/pages/error.php');
+        }
+    }
+
+
     public function mes_photos() {
 
       $user_result = User::find($_SESSION['user']['username']);
@@ -59,9 +88,6 @@
               require_once('../public/views/elements/navbar.php');
               require_once('views/photos/affiche_photo.php');             
             }
-
-
-     
       }      
     }
 
@@ -130,10 +156,30 @@
 
     }
 
-
-    public function comment_photo()
+    public function cherche_photo()
     {
-      
+      if(isset($_POST['submit_recherche']))
+      {
+        $mot_cle = $_POST['mot_cle'];
+        echo $mot_cle;
+
+        $photo_result = Photo::search($mot_cle);
+
+        if ($photo_result['failed']) 
+        {
+          $_SESSION['error'] = $photo_result['error'];
+          require_once('../public/views/elements/navbar.php');
+          require_once('views/pages/home.php'); 
+        }
+        else
+        {
+          $images = $photo_result['objects'];
+          require_once('../public/views/elements/navbar.php');
+          require_once('views/photos/recherche.php');             
+
+        }
+
+        }
     }
 
   }

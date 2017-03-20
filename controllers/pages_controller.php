@@ -98,8 +98,7 @@
 
     public function logout()
     {
-      
-      session_start();
+
       $_SESSION = array();
       session_destroy();
       require_once('../public/views/elements/navbar.php');
