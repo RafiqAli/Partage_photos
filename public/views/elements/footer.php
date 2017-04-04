@@ -4,7 +4,7 @@
 <br>
 <div class="page-wrapper">
 <div class="container">
-		    <footer class="well col-md-offset-2">
+		    <footer class="well">
         <div class="pull-left">
         	<legend>PhotoShare</legend>
         </div>

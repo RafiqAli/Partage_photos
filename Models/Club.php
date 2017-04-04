@@ -12,7 +12,7 @@ class Group {
 	public $admin;
 	public $description;
 
-	public function __construct($id = null,$title,$admin,$description){
+	public function __construct($title,$admin,$description,$id = null){
 
 	 $this->id = $id;
 	 $this->title = $title;
@@ -206,7 +206,7 @@ class Group {
 		if($output != null)
 		{
 			
-			$sql = "INSERT INTO user_club (user_id,club_id) VALUES (:user_id,:club_id)"
+			$sql = "INSERT INTO user_club (user_id,club_id) VALUES (:user_id,:club_id)";
 
 			$data = array(':user_id' => $user['id'],':club_id' => $this->id);
 

@@ -10,9 +10,6 @@
     <!-- Bootstrap Core CSS -->
     <link href="res/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Custom CSS -->
-    <link href="res/css/sb-admin.css" rel="stylesheet">
-
     <!-- Custom Fonts -->
     <link href="res/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
@@ -25,25 +22,27 @@
   <body>
 
 <br><br><br><br>
+
 <div class="container-fluid">
 
 
-     <div class="container-fluid col-xs-offset-2">
-        <?php require_once('../routes.php'); ?> 
-    </div>
+ <div class="container-fluid">
+    <?php require_once('../routes.php'); ?> 
+</div>
 
-    <div class="col-xs-6 col-xs-offset-4 modal-fade" data-backdrop="static" style="z-index: 100; top: 12%; left:auto; width:50%; position: fixed;">
-      <?php require_once('views/elements/messages.php'); ?>  
-    </div>
+<div class="col-md-6 col-md-offset-3 modal-fade" data-backdrop="static" style="z-index: 100; top: 12%; left:auto; width:50%; position: fixed;">
+  <?php require_once('views/elements/messages.php'); ?>  
+</div>
 
-    <?php  include_once("./views/elements/footer.php"); ?>
+<?php  include_once("./views/elements/footer.php"); ?>
 
 </div>
-      <!-- jQuery -->
-    <script src="res/js/jquery.js"></script>
+  <!-- jQuery -->
+<script src="res/js/jquery.js"></script>
 
-    <!-- Bootstrap Core JavaScript -->
-    <script src="res/js/bootstrap.min.js"></script>
+<!-- Bootstrap Core JavaScript -->
+<script src="res/js/bootstrap.min.js"></script>
+
   
   <body>
 <html>
