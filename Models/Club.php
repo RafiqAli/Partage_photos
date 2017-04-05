@@ -5,19 +5,29 @@ require_once("../core/Request.php");
 require_once("../core/Regex.php");
 
 
-class Group {
+class Club {
 
-	public $id;
-	public $title;
-	public $admin;
-	public $description;
+	public  $id;
+	public  $title;
+	public  $admin;
+	public  $description;
+	private $user;
 
-	public function __construct($id = null,$title,$admin,$description){
+	public function __construct($id = null,$title,$description,$admin,$user = null)
+	{
 
-	 $this->id = $id;
-	 $this->title = $title;
-	 $this->admin = $admin;
-	 $this->description = $description; 
+		 $this->id          = $id;
+		 $this->title       = $title;
+		 $this->admin       = $admin;
+		 $this->description = $description; 
+		 
+		 /* this member variable holdes the instance of the user
+		  * as a source reference. e.g 
+		  * $user->get_club($id)->add_photo($photo)
+		  * this variable will preserve the user instance to be 
+		  * used on the add_photo function. 
+		  */
+		 $this->user        = $user;
 
 	}
 
@@ -162,6 +172,12 @@ class Group {
 
 		 	$output = Request::execute($sql,$data);
 
+		 	$sql = "INSERT INTO user_club (user_login,club_id) VALUES (:user_id,:club_id)";
+
+		 	$data = array('user_id' => $club['admin'],'club_id' => Request::lastInsertId());
+
+		 	$output = Request::execute($sql,$data);
+
 		 	return array('failed' => false, 'output' => $output, 'error' => '');
 
 		}
@@ -172,7 +188,7 @@ class Group {
 	}
 
 
-	public function add_photo($photo)
+	public function add_photo($user,$photo)
 	{
 
 		$photo = Photo::create($photo['info'],$photo['file']);
@@ -206,7 +222,7 @@ class Group {
 		if($output != null)
 		{
 			
-			$sql = "INSERT INTO user_club (user_id,club_id) VALUES (:user_id,:club_id)"
+			$sql = "INSERT INTO user_club (user_id,club_id) VALUES (:user_id,:club_id)";
 
 			$data = array(':user_id' => $user['id'],':club_id' => $this->id);
 
@@ -241,6 +257,13 @@ class Group {
 			return array('failed' => true, 'error' => 'please enter a numeric value');
 		}
 
+	}
+
+	public function user_ref()
+	{
+		print_r($this->user);
+
+		echo $this->user->login."\n";
 	}
 
 }
