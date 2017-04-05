@@ -148,7 +148,48 @@ class Helpers {
         return $Result;
     }
 
+    public static function match($key,$keys)
+    {
+
+        $matched = false;
+
+        for ($i=0; $i < count($keys); $i++)
+        { 
+            if($key == $keys[$i]) $matched = true;
+        }
+
+        return $matched;
+
+    }
+
+    public static function nullOrEmpty($fields,$array)
+    {
+
+        $keys = array_keys($array);
+
+        foreach ($array as $key => $value) {
+            
+            if(match($key,$keys))
+            {
+
+            }
+            else
+            {
+
+            }
+        }
+
+
+            //if (match($key,$fields)) // make a list of boolean and indicators and return the elements that is missing. 
+
+            // proceed with the same way with empty case.
+
+        
+    }
+
 }
+
+
 
 
 
