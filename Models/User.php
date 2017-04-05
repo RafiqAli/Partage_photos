@@ -5,6 +5,7 @@ require_once("../core/Request.php");
 require_once("../core/Regex.php");
 require_once("Upload.php");
 require_once("Photo.php");
+require_once("Club.php");
 
 
 class User {
@@ -110,7 +111,8 @@ class User {
 
 
 
-	public function photos() {
+	public function photos()
+	{
 
 		$list_photos = [];
 
@@ -202,6 +204,65 @@ class User {
 		else
 		{
 			return array('failed' => true, 'error' => 'please enter a valid password format.');
+		}
+
+	}
+
+
+	public static function clubs()
+	{
+
+		$list_clubs = [];
+
+		$sql = "SELECT c.id, c.title, c.description,c.admin
+				FROM clubs c, user_club uc WHERE uc.user_login = '".$this->login."' ;";
+
+
+		$clubs = Request::execute($sql);
+
+		if($clubs != null)
+		{
+
+			foreach ($clubs as $club)
+			{
+				$list_clubs[] = new Club($club['id'],$club['title'],$club['description'],$club['admin']);
+			}
+
+			return array('failed' => false,'objects' => $list_clubs, 'error' => '');
+		}
+		else
+		{
+			return array('failed' => true, 'error' => 'this user has no clubs.');
+		}
+
+	}
+
+
+	public function get_club($id)
+	{
+
+		if(Regex::validate(Regex::DIGITS,$id))
+		{
+
+      		$sql = "SELECT * FROM clubs WHERE id='".$id."' ;";
+
+      		$club = Request::execute($sql);
+
+      		if($club != null)
+      		{
+      			$club = $club[0];
+      			$club_instance = new Club($club['id'],$club['title'],$club['description'],$club['admin'],$this);
+
+      			return array('failed' => false,'object' => $club_instance,'error' => '');	
+      		} 
+			else
+			{
+				return array('failed' => true, 'object' => '', 'error' => 'This club does not exist.');
+			}
+		}
+		else
+		{
+			return array('failed' => true, 'object' => '', 'error' => 'The format of id is invalid');
 		}
 
 	}
