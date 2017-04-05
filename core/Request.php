@@ -62,6 +62,11 @@ class Request {
 		Connection::getPDO()->query($query);
 	}
 
+     public static function lastInsertId()
+     {
+          return Connection::getPDO()->lastInsertId();
+     }
+
 
 }
 
