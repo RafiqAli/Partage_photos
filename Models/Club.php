@@ -16,6 +16,7 @@ class Club {
 	public function __construct($id = null,$title,$description,$admin,$user = null)
 	{
 
+
 		 $this->id          = $id;
 		 $this->title       = $title;
 		 $this->admin       = $admin;
@@ -27,7 +28,7 @@ class Club {
 		  * this variable will preserve the user instance to be 
 		  * used on the add_photo function. 
 		  */
-		 $this->user        = $user;
+		 $this->user = $user;
 
 	}
 

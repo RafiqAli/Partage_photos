@@ -78,7 +78,7 @@
             
             if($comment_result['failed'])
             {
-              $_SESSION['error'] = $comment_result['error'];
+              $_SESSION['info'] = $comment_result['error'];
               require_once('../public/views/elements/navbar.php');
               require_once('views/photos/affiche_photo.php');  
             }
@@ -167,7 +167,7 @@
 
         if ($photo_result['failed']) 
         {
-          $_SESSION['error'] = $photo_result['error'];
+          $_SESSION['info'] = $photo_result['error'];
           require_once('../public/views/elements/navbar.php');
           require_once('views/pages/home.php'); 
         }

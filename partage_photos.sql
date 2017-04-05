@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.6.6
--- https://www.phpmyadmin.net/
+-- version 4.5.5.1
+-- http://www.phpmyadmin.net
 --
--- Client :  localhost
--- Généré le :  Lun 03 Avril 2017 à 11:59
--- Version du serveur :  5.7.17-0ubuntu0.16.04.1
--- Version de PHP :  7.0.15-0ubuntu0.16.04.4
+-- Client :  127.0.0.1
+-- Généré le :  Mar 04 Avril 2017 à 13:52
+-- Version du serveur :  5.7.11
+-- Version de PHP :  7.0.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -39,7 +39,8 @@ CREATE TABLE `clubs` (
 
 INSERT INTO `clubs` (`id`, `title`, `description`, `admin`) VALUES
 (1, 'friends', 'this group is made for friends to meet and get to know each other more and share what they cherish with each other.', 'ali'),
-(2, 'lovers', 'where lovers meet.', 'yassir');
+(2, 'lovers', 'where lovers meet.', 'yassir'),
+(3, 'test', 'test', 'yassir2');
 
 -- --------------------------------------------------------
 
@@ -63,7 +64,9 @@ INSERT INTO `comments` (`id`, `content`, `owner`, `photo_id`) VALUES
 (2, 'ok this is good', 'ali', 22),
 (4, 'this is a comment 4', 'ali', 22),
 (5, 'this is a comment 5', 'ali', 22),
-(6, 'this might be id four', 'ali', 21);
+(6, 'this might be id four', 'ali', 21),
+(7, 'helo', 'yassir2', 25),
+(8, 'nice tof', 'simo', 27);
 
 -- --------------------------------------------------------
 
@@ -79,7 +82,7 @@ CREATE TABLE `photos` (
   `description` text NOT NULL,
   `file` varchar(255) NOT NULL,
   `owner` varchar(255) NOT NULL,
-  `visibility` int(20) NOT NULL
+  `visibility` int(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -87,10 +90,10 @@ CREATE TABLE `photos` (
 --
 
 INSERT INTO `photos` (`id`, `title`, `name`, `date`, `description`, `file`, `owner`, `visibility`) VALUES
-(18, 'PhotoTest', '14212165_1379492905441163_7402284545959690173_n.jpg', '2017-03-15', 'this is a description', 'mDEAbMBr.jpeg', 'ali', 0),
 (19, 'PhotoTest', '14212165_1379492905441163_7402284545959690173_n.jpg', '2017-03-15', 'this is a description', 'GX3l4fZI.jpeg', 'ali', 0),
 (21, 'this is a name', 'tightropewalkers.jpg', '2017-03-15', 'this is a description', 'iC3NPOEb.jpeg', 'ali', 0),
-(24, 'oooooooooooooo', '12767598_1682830325319227_1382226467_n.jpg', '2017-03-21', 'ooooooooooooooooooo', 'sOpEIUL1.jpeg', 'yassir', 0);
+(25, 'hello world', '2.jpg', '2017-04-13', 'test', 'ro4DRgVa.jpeg', 'yassir2', NULL),
+(27, 'kkk', '3.jpg', '2017-04-22', 'dd', 'fHKhoovm.jpeg', 'simo', NULL);
 
 -- --------------------------------------------------------
 
@@ -130,7 +133,9 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`login`, `password`) VALUES
 ('ali', 'e5e9fa1ba31ecd1ae84f75caaa474f3a663f05f4'),
-('yassir', '5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8');
+('simo', '65f99581a93cf30dafc32b5c178edc6b0294a07f'),
+('yassir', '5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8'),
+('yassir2', '40bd001563085fc35165329ea1ff5c5ecbdbbeef');
 
 -- --------------------------------------------------------
 
@@ -192,17 +197,17 @@ ALTER TABLE `user_club`
 -- AUTO_INCREMENT pour la table `clubs`
 --
 ALTER TABLE `clubs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 --
 -- AUTO_INCREMENT pour la table `comments`
 --
 ALTER TABLE `comments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 --
 -- AUTO_INCREMENT pour la table `photos`
 --
 ALTER TABLE `photos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

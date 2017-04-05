@@ -281,7 +281,7 @@ class Upload {
 
 		 	$allowed_type = self::is_allowed_type($file['type'],'image');
 
-		 	var_dump($allowed_type);
+		 	//var_dump($allowed_type);
 
 	 		if ($user_file_name['failed'] == true) 
 	 		{

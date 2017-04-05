@@ -76,8 +76,9 @@
 </div>
 
           <!-- User comment -->
-   <div class="well text-center">
+<div class="well text-center">
 
+<legend>Ajouter un commentaire</legend>
   <div class="row text-left">
   <div class="col-md-1">
   <div class="thumbnail">

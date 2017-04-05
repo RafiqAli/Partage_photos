@@ -1,3 +1,5 @@
+<div class="well col-md-8 col-md-offset-2">
+
   <form method="post"> 
           <div id="page-wrapper">
           <!-- Page Heading -->
@@ -42,3 +44,4 @@
         </div>
 </form>
 
+</div>
