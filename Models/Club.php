@@ -51,7 +51,7 @@ class Club {
 
 	      			$club = $club[0];
 
-		      		$club_instance = new club($club['id'],$club['title'],$club['admin'],$club['description'],$club['description']);
+		      		$club_instance = new club($club['id'],$club['title'],$club['admin'],$club['description']);
 
 		      		return array('failed' => false, 'object' => $club_instance, 'error' => '');
 
