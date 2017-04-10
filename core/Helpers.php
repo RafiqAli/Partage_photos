@@ -187,6 +187,28 @@ class Helpers {
         
     }
 
+
+    // defines the priority of fields on a table
+    // to be used on generating order of priority
+    // of fields on order by sql statements
+    public static function priority($table_name)
+    {
+        $sql = "SHOW columns FROM ".$table_name;
+
+        $columns = Request::execute($sql);
+
+        $columns_names = array();
+
+        for ($i = 0; $i < count($columns); $i++) {
+
+            array_push($columns_names, $columns[$i]['Field']);
+        }
+
+        return $columns_names;
+
+
+    }
+
 }
 
 
