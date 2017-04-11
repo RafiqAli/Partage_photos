@@ -6,6 +6,7 @@ require_once("../core/Regex.php");
 require_once("Upload.php");
 require_once("Photo.php");
 require_once("Club.php");
+require_once("Rating.php");
 
 
 class User {
@@ -139,6 +140,7 @@ class User {
 
 		
 	}
+
 
 	public static function create($user)
 	{
@@ -288,8 +290,42 @@ class User {
 
 	public function __toString()
 	{
-		return "User : [login] ".$this->login." [password] : ".$this->password." \n";
+		return "User : [login] :".$this->login." [password] : ".$this->password." \n";
 	}
+
+
+// untested functions
+
+
+
+	  public function ratings()
+	  {
+
+		  	$list_ratings = [];
+
+		  	$sql = "SELECT r.photo_id,r.owner,r.value,r.description,r.date_created FROM ratings r  INNER JOIN users u ON r.photo_id = u.owner HAVING r.owner = '".$this->login."' ;";
+
+		  	$ratings = Request::execute($sql);
+
+		  	if($ratings != null)
+		  	{
+
+			  	foreach ($ratings as $rating) {
+			  	
+
+			  		$list_ratings[] = new Rating($rating['photo_id'],$rating['owner'],$rating['value'],$rating['description'],$rating['date_created']);
+			  	}
+
+			  	return array('failed' => false, 'objects' => $list_ratings, 'error' => '');
+
+		  	}
+		  	else
+		  	{
+		  		return array('failed' => true, 'error' => 'no rating has been found for that user.');
+		  	}	  	
+
+	  }
+
 
 
 }

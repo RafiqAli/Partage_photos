@@ -4,6 +4,8 @@ require_once("../core/Request.php");
 require_once("Upload.php");
 require_once("../core/Regex.php");
 require_once("Comment.php");
+require_once("Category.php");
+require_once("core/Enumerations.php");
 
 class Photo {
 
@@ -151,8 +153,8 @@ class Photo {
 		
 	}
 
-	  public static function create($photo,$file)
-	  {
+	 public static function create($photo,$file)
+	 {
 
 	  	if(isset($photo['title'])       &&  $photo['title']       != null 
 		&& isset($photo['date'])        &&  $photo['date']        != null
@@ -321,6 +323,333 @@ class Photo {
 	  	return 'Photo : [id] : '.$this->id.' [title] : '.$this->title.' [name] : '.$this->name.' [date] : '.$this->date.' [description] : '.$this->description.' [file] : '.$this->file.'  [owner] : '.$this->owner;
 	  } 
 
+
+// untested functions 
+
+
+
+	/*
+	 * Returns photos based on occurences with text and time
+	 *
+	 * @param $type : indicate the type of the search, see core/Enumeration
+	 * @param $arg1 : the main argument that the function uses as key for occurences
+	 *                search
+	 * @param $arg2 : made specially for the DATE_BETWEEN case, null on other cases.
+	 *
+	 * @Returns array  : contains a boolean key 'failed' that indicates whether the function 
+	 * 					 succeeded at finding occurences or not, case success the
+	 * 					 array contains list of photos under the key 'objects' and
+	 * 					 an empty value of the 'error' key, that contains generally
+	 * 					 a message of the probable cause of the error.  
+	 */
+	public static function neo_search(int $type,$arg1,$arg2 = null)
+	{
+
+		switch ($type)
+		{
+
+			case Search::Text :
+				
+				if(Regex::validate(Regex::TEXT,$arg1)) 
+				{
+
+					$sql = "SELECT * FROM photos p JOIN comments   c   ON (c.photo_id   = p.id)
+												   JOIN categories t   ON (t.photo_id   = p.id)
+												   JOIN ratings    r   ON (r.photo_id   = p.id)
+
+									 WHERE              p.name         LIKE '%':key'%' 
+										   		   OR   p.description  LIKE '%':key'%'
+										   		   OR   p.owner        LIKE '%':key'%'
+										   		   OR   c.content      LIKE '%':key'%'
+										   		   OR   c.owner        LIKE '%':key'%'
+										   		   OR   t.name         LIKE '%':key'%'
+										   		   OR   t.description  LIKE '%':key'%'
+										   		   OR   r.owner        LIKE '%':key'%'
+										   		   OR   r.description  LIKE '%':key'%'";
+
+					
+					$data = array(':key' => $arg1);					
+
+				}
+				else
+				{
+					$type_format = array('failed' => true, 'error' => "Argument format invalid");
+				}
+
+			break;
+			
+			case Search::BETWEEN_DATE:
+
+				if(Regex::validate(Regex::DATE,$arg1) && Regex::validate(Regex::DATE,$arg2))
+				{
+					$sql = "SELECT * FROM photos p WHERE date BETWEEN:key1 AND :key2";
+					$data = array(':key1' => $arg1,':key2' => $arg2);
+				}
+				else
+				{
+					$type_format = array('failed' => true, 'error' => "Argument format invalid");
+				}
+
+			break;
+			
+			case Search::DATE: 
+				
+				if(Regex::validate(Regex::DATE,$arg1))
+				{
+					$sql = "SELECT * FROM photos p WHERE date=:key"; 
+					$data = array(':key' => $arg1);
+				}
+				else
+				{
+					$type_format = array('failed' => true, 'error' => "Argument format invalid");
+				}
+
+			break;
+			
+			case Search::BEFORE_DATE: 
+				
+				if(Regex::validate(Regex::DATE,$arg1))
+				{
+					$sql = "SELECT * FROM photos p WHERE date<:key"; 					
+					$data = array(':key' => $arg1);
+				}
+				else
+				{
+					$type_format = array('failed' => true, 'error' => "Argument format invalid");
+				}
+
+			break;
+			
+			case Search::AFTER_DATE: 
+
+				if(Regex::validate(Regex::DATE,$arg1))
+				{
+					$sql = "SELECT * FROM photos p WHERE date>:key"; 					
+					$data = array(':key' => $arg1);
+				}
+				else
+				{
+					$type_format = array('failed' => true, 'error' => "Argument format invalid");
+				}
+
+			break;
+			
+
+			default:
+				
+				return array('failed' => true,'error' => 'please make sure the value that you entered is defined as a constant in the core/Enumeration/Search class.');
+
+				break;
+		}
+
+		if($type_format['failed'] == false)
+		{
+
+
+
+			$photos = Request::execute($sql,$data);
+
+	  		if($photos != null)
+	  		{
+	  			$list_photos = [];
+
+				foreach ($photos as $photo)
+				{
+					$list_photos[] = new Photo($photo['id'],$photo['title'],$photo['name'],$photo['date'],
+											   $photo['description'],$photo['file'],$photo['owner']);
+				}
+
+				return array('failed' => false,'objects' => $list_photos, 'error' => '');
+			}
+			else
+			{
+				return array('failed' => true, 'error' => 'Aucune photo ne correspond a votre recherche');
+			}
+		
+		}
+		else
+		{
+			return $type_format;
+		}
+
+	}
+
+
+	public static function sort(int $type)
+	{
+		if(Regex::validate(Regex::DIGITS,$type))
+		{
+			switch ($type) {
+
+				case Sort::NEWEST    : $sql = "SELECT * FROM photos ORDER BY date DESC";
+				break;
+
+				case Sort::OLDEST    : $sql = "SELECT * FROM photos ORDER BY date ASC"; 
+				break;
+
+				case Sort::TOP_RATED : $sql = "SELECT * FROM photos p JOIN ratings r ON (p.id = r.photo_id) ORDER BY AVG(r.value) DESC";
+
+				break;
+
+				case Sort::LOW_RATED : $sql = "SELECT * FROM photos p JOIN ratings r ON (p.id = r.photo_id) ORDER BY AVG(r.value) ASC";
+				break;
+				
+				default:
+					
+					return array('failed' => true,'error' => 'please make sure the value that you entered is defined as a constant in the core/Enumeration/Sort class.');
+
+					break;
+			}
+
+			$sorted_photos = Request::query($sql);
+
+	  		if($sorted_photos != null)
+	  		{
+	  			$list_photos = [];
+
+				foreach ($sorted_photos as $photo)
+				{
+					$list_photos[] = new Photo($photo['id'],$photo['title'],$photo['name'],$photo['date'],
+											   $photo['description'],$photo['file'],$photo['owner']);
+				}
+
+				return array('failed' => false,'objects' => $list_photos, 'error' => '');
+			}
+			else
+			{
+				return array('failed' => true, 'error' => 'No photo had been found on the database.');
+			}
+
+		}
+		else
+		{
+			return array('failed' => true,'error' => 'please make sure you entered a valid numeric value.');
+		}
+
+	}
+
+
+
+	  public function categories()
+	  {
+
+		$list_categories = [];
+
+		$sql = "SELECT c.id, c.name, c.description,c.photo_id
+				FROM categories c, photo_category pc WHERE pc.photo_id = '".$this->id."' ;";
+
+
+		$categories = Request::execute($sql);
+
+		if($categories != null)
+		{
+
+			foreach ($categories as $category)
+			{
+				$list_categories[] = new Category($category['id'],$category['name'],$category['description'],$category['photo_id']);
+			}
+
+			return array('failed' => false,'objects' => $list_categories, 'error' => '');
+		}
+		else
+		{
+			return array('failed' => true, 'error' => 'this photo has no categories.');
+		}
+
+	  }
+
+	  public function add_categorties($categories)
+	  {
+
+	  	if(is_array($categories))
+	  	{
+	  		foreach ($categories as $category) {
+	  			
+	  			$sql = "INSERT INTO photo_category (photo_id,category_id) VALUES (photo_id,category_id)";
+	  			$data = array(":photo_id" => $this->id,":category_id" => $category->id);
+
+	  			Request::execute($sql,$data);
+
+	  		}
+	  	}
+	  	else // one object
+	  	{
+	  		$category = $categories;
+ 	
+			$sql = "INSERT INTO photo_category (photo_id,category_id) VALUES (photo_id,category_id)";
+  			$data = array(":photo_id" => $this->id,":category_id" => $category->id);
+
+  			Request::execute($sql,$data);
+
+	  	}
+
+
+	  }
+
+	  public function delete_categories($categories)
+	  {
+
+	  	if($categories == Category::ALL)
+	  	{
+	  		Request::query("DELETE FROM photo_category WHERE photo_id=".$this->id);
+	  	}
+	  	else if (is_array($categories))
+	  	{
+	  		foreach ($categories as $category) {
+	  			
+	  			Request::query("DELETE FROM photo_category WHERE photo_id=".$this->id." AND category_id=".$category->id);
+	  		}
+
+	  	}
+	  	else
+	  	{
+	  		$category = $categories; // $categories contains one object
+
+	  		Request::query("DELETE FROM photo_category WHERE photo_id=".$this->id." AND category_id=".$category->id);
+	  	}
+
+	  }
+
+	  public function ratings()
+	  {
+
+		  	$list_ratings = [];
+
+		  	$sql = "SELECT r.photo_id,r.owner,r.value,r.description,r.date_created FROM ratings r  INNER JOIN photos p ON r.photo_id = p.id HAVING r.photo_id = '".$this->id."' ;";
+
+		  	$ratings = Request::execute($sql);
+
+		  	if($ratings != null)
+		  	{
+
+			  	foreach ($ratings as $rating) {
+			  	
+
+			  		$list_ratings[] = new Rating($rating['photo_id'],$rating['owner'],$rating['value'],$rating['description'],$rating['date_created']);
+			  	}
+
+			  	return array('failed' => false, 'objects' => $list_ratings, 'error' => '');
+
+		  	}
+		  	else
+		  	{
+		  		return array('failed' => true, 'error' => 'no rating has been posted on this with photo.');
+		  	}	  	
+
+	  }
+
+	  public function average_rating()
+	  {
+
+	  	$sql = "SELECT AVG(value) FROM ratings WHERE photo_id=".$this->id;
+
+	  	$average_rating = Request::execute($sql);
+
+	  	return array('failed' => false, 'average' => $average_rating, 'error' => '');
+		  		  	
+	  }
+
 }
+
 
 ?>
