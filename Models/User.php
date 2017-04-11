@@ -209,7 +209,7 @@ class User {
 	}
 
 
-	public static function clubs()
+	public function clubs()
 	{
 
 		$list_clubs = [];
