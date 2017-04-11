@@ -5,7 +5,7 @@ require_once("Upload.php");
 require_once("../core/Regex.php");
 require_once("Comment.php");
 require_once("Category.php");
-require_once("core/Enumerations.php");
+require_once("../core/Enumerations.php");
 
 class Photo {
 
@@ -16,6 +16,9 @@ class Photo {
 	  public $date;
 	  public $file;
 	  public $description;
+	  public $visibility;
+	  public $link;
+	  public $local_area_id;
 
 
 
@@ -546,7 +549,7 @@ class Photo {
 
 			foreach ($categories as $category)
 			{
-				$list_categories[] = new Category($category['id'],$category['name'],$category['description'],$category['photo_id']);
+				$list_categories[] = new Category($category['id'],$category['name'],$category['description']);
 			}
 
 			return array('failed' => false,'objects' => $list_categories, 'error' => '');
@@ -647,6 +650,27 @@ class Photo {
 
 	  	return array('failed' => false, 'average' => $average_rating, 'error' => '');
 		  		  	
+	  }
+
+	  // under construction
+
+	  public function add_local_area($local_area)
+	  {
+	  		LocalArea::create($local_area);
+
+
+	  }
+	  public function update_local_area($local_area){}
+	  public function delete_local_area($local_area){}
+
+	  // i gone confused because we can't  [..] the constructor
+	  // with tons of attributes, so we have to define setters
+	  // and setters need to have an object not an id which 
+	  // creates a conflict between the object attribute and
+	  // the id (database-oriented) attribute
+	  public function set_local_area($local_area)
+	  {
+
 	  }
 
 }
