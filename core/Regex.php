@@ -3,7 +3,7 @@
 class Regex {
 
 
-	const NAME     = "[a-zA-z]{3,20}";
+	const NAME     = "[A-Za-z]+";
 
 	const EMAIL    = "^[^@]+@[^@]+\.[^@]+$";
 
