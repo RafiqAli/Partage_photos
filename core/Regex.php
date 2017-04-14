@@ -23,6 +23,8 @@ class Regex {
 
     const RICHTEXT = '[A-Za-z0-9]{2,1000}';
 
+    const DATE     = '';
+
 	public static function parseConst(string $string) {
 
 
