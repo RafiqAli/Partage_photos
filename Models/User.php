@@ -303,7 +303,7 @@ class User {
 
 		  	$list_ratings = [];
 
-		  	$sql = "SELECT r.photo_id,r.owner,r.value,r.description,r.date_created FROM ratings r  INNER JOIN users u ON r.photo_id = u.owner HAVING r.owner = '".$this->login."' ;";
+		  	$sql = "SELECT r.photo_id,r.owner,r.value,r.description,r.date_created FROM ratings r JOIN users u ON (r.owner = u.login) WHERE r.owner = '".$this->login."' ;";
 
 		  	$ratings = Request::execute($sql);
 

@@ -4,7 +4,7 @@
 require_once("../core/Request.php");
 require_once("../core/Regex.php");
 require_once("Photo.php");
-require_once("core/Enumerations.php");
+require_once("../core/Enumerations.php");
 
 class Rating
 {
@@ -27,8 +27,7 @@ class Rating
 		if(Regex::validate(Regex::DIGITS,$photo_id) 
 			&& Regex::validate(Regex::NAME,$owner) 
 				&& Regex::validate(Regex::DIGITS,$value)
-					&& Regex::validate(Regex::RICHTEXT,$description)
-						&& Regex::validate(Regex::DATE,$date_created))
+					&& ( $description == null || Regex::validate(Regex::RICHTEXT,$description)))
 		{
 
 			 $this->photo_id      = $photo_id;
@@ -36,7 +35,6 @@ class Rating
 			 $this->value         = $value;
 			 $this->description   = $description;
 			 $this->date_created  = $date_created;
-
 		
 		}
 		else
@@ -62,7 +60,7 @@ class Rating
 
 		  	foreach ($output as $rating) {
 		  		
-		  		$list[] = new Rating($rating['photo_id'],$rating['owner'],$rating['value'],$rating['description'],$rating['date_created']);
+		  		$list[] = new Rating($rating['photo_id'],$rating['owner'],$rating['value'],$rating['description']);
 		  	}
 
 		  	return  array('failed' => false, 'objects' => $list, 'error' => '');
@@ -75,13 +73,14 @@ class Rating
 	}
 
 
-	public function find($id)
+	public static function find($photo_id,$owner)
 	{
 
-  		if(Regex::validate(Regex::DIGITS,$id))
+  		if(Regex::validate(Regex::DIGITS,$photo_id)
+  			&& Regex::validate(Regex::NAME,$owner))
   		{
 
-      		$sql = "SELECT * FROM ratings WHERE id=".$id;
+      		$sql = "SELECT * FROM ratings WHERE photo_id=".$photo_id." AND owner='".$owner."'";
 
       		$rating = Request::execute($sql);
 
@@ -90,7 +89,7 @@ class Rating
 
       			$rating = $rating[0];
 
-	      		$rating_instance = new Rating($rating['photo_id'],$rating['owner'],$rating['value'],$rating['description'],$rating['date_created']);
+	      		$rating_instance = new Rating($rating['photo_id'],$rating['owner'],$rating['value'],$rating['description']);
 
 	      		return array('failed' => false, 'object' => $rating_instance, 'error' => '');
 
@@ -114,17 +113,16 @@ class Rating
 		if(Regex::validate(Regex::DIGITS,$rating['photo_id']) 
 			&& Regex::validate(Regex::NAME,$rating['owner']) 
 				&& Regex::validate(Regex::DIGITS,$rating['value'])
-					&& Regex::validate(Regex::RICHTEXT,$rating['description'])
-						&& Regex::validate(Regex::DATE,$rating['date_created']))
+					&& Regex::validate(Regex::RICHTEXT,$rating['description']))
 		{	
 
-			$sql = "INSERT INTO ratings (photo_id,owner,value,date_created,date_modified) VALUES (:photo_id,:owner,:description,:date_created)";
+			$sql = "INSERT INTO ratings (photo_id,owner,value,description,date_created) VALUES (:photo_id,:owner,:value,:description,Now())";
 
-		 	$data = array(':photo_id' => $rating['photo_id'], ':owner' => $rating['owner'], ':description' => $rating['description'], ':date_created' => $rating['date_created']);
+		 	$data = array(':photo_id' => $rating['photo_id'], ':owner' => $rating['owner'],':value' => $rating['value'], ':description' => $rating['description']);
 
 		 	$output = Request::execute($sql,$data);
 
-		 	$rating = new Rating($rating['photo_id'],$rating['owner'],$rating['value'],$rating['description'],$rating['date_created']);
+		 	$rating = new Rating($rating['photo_id'],$rating['owner'],$rating['value'],$rating['description']);
 
 		 	return array('failed' => false, 'object' => $rating, 'error' => '');
 
@@ -141,7 +139,7 @@ class Rating
 	{
 		if(Regex::validate(Regex::DIGITS,$value))
 	  	{
-	  		$sql = "UPDATE ratings SET value = '".$value."' WHERE id = ".$this->id.";";
+	  		$sql = "UPDATE ratings SET value = '".$value."' WHERE photo_id = ".$this->photo_id." AND owner='".$this->owner."';";
 
 	  		Request::query($sql);
 
@@ -158,7 +156,7 @@ class Rating
 	{
 		if(Regex::validate(Regex::RICHTEXT,$description))
 	  	{
-	  		$sql = "UPDATE ratings SET description = '".$description."' WHERE id = ".$this->id.";";
+	  		$sql = "UPDATE ratings SET description = '".$description."' WHERE photo_id = ".$this->photo_id." AND owner='".$this->owner."';";
 
 	  		Request::query($sql);
 
@@ -171,13 +169,14 @@ class Rating
 
 	} 
 
-	public static function delete($id)
+	public static function delete($photo_id,$owner)
 	{
 
-		if(Regex::validate(Regex::DIGITS,$id))
+		if(Regex::validate(Regex::DIGITS,$photo_id)
+			&& Regex::validate(Regex::NAME,$owner))
 		{
 
-			$sql = "DELETE FROM ratings WHERE id=$id";
+			$sql = "DELETE FROM ratings WHERE photo_id=".$photo_id." AND owner='".$owner."';";
 
 			$output = Request::query($sql);
 
