@@ -20,11 +20,6 @@
         <legend>Photos de <?php echo $_SESSION['user']['username']; ?></legend>
       </div>
 
-      <div class="col-md-2">
-         <?php require_once('views/elements/sort_view.php'); ?>
-      </div>
-
-
     </div>
 
 
