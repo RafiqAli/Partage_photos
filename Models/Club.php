@@ -72,7 +72,7 @@ class Club {
 	}
 
 
-	public function all(){
+	public static function all(){
 
 
 	  	$list = [];

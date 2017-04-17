@@ -63,6 +63,7 @@ function call($controller, $action)
 
       // we need the model to query the database later in the controller
       require_once('Models/Club.php');
+      require_once('Models/User.php');
       $controller = new GroupsController();
 
     break;
