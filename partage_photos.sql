@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.5.5.1
--- http://www.phpmyadmin.net
+-- version 4.6.6
+-- https://www.phpmyadmin.net/
 --
--- Client :  127.0.0.1
--- Généré le :  Mar 04 Avril 2017 à 13:52
--- Version du serveur :  5.7.11
--- Version de PHP :  7.0.4
+-- Client :  localhost
+-- Généré le :  Lun 17 Avril 2017 à 14:29
+-- Version du serveur :  5.7.17-0ubuntu0.16.04.1
+-- Version de PHP :  7.0.15-0ubuntu0.16.04.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -19,6 +19,27 @@ SET time_zone = "+00:00";
 --
 -- Base de données :  `partage_photos`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `categories`
+--
+
+CREATE TABLE `categories` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `description` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Contenu de la table `categories`
+--
+
+INSERT INTO `categories` (`id`, `name`, `description`) VALUES
+(1, 'animals', 'this is a sample animals category'),
+(2, 'name', 'description'),
+(3, 'name', 'description');
 
 -- --------------------------------------------------------
 
@@ -40,7 +61,10 @@ CREATE TABLE `clubs` (
 INSERT INTO `clubs` (`id`, `title`, `description`, `admin`) VALUES
 (1, 'friends', 'this group is made for friends to meet and get to know each other more and share what they cherish with each other.', 'ali'),
 (2, 'lovers', 'where lovers meet.', 'yassir'),
-(3, 'test', 'test', 'yassir2');
+(3, 'club1', 'club1 description', 'ali'),
+(4, 'club1', 'club1 description', 'ali'),
+(5, 'club2', 'club2 description', 'yassir'),
+(6, 'club2', 'club2 description', 'yassir');
 
 -- --------------------------------------------------------
 
@@ -65,8 +89,23 @@ INSERT INTO `comments` (`id`, `content`, `owner`, `photo_id`) VALUES
 (4, 'this is a comment 4', 'ali', 22),
 (5, 'this is a comment 5', 'ali', 22),
 (6, 'this might be id four', 'ali', 21),
-(7, 'helo', 'yassir2', 25),
-(8, 'nice tof', 'simo', 27);
+(7, 'this is content', 'ali', 19),
+(8, 'content number 2', 'ali', 19),
+(9, 'content 3', 'ali', 19),
+(10, 'content 4', 'ali', 19);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `local_areas`
+--
+
+CREATE TABLE `local_areas` (
+  `id` int(11) NOT NULL,
+  `street` varchar(255) NOT NULL,
+  `city` varchar(255) NOT NULL,
+  `country` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -79,21 +118,44 @@ CREATE TABLE `photos` (
   `title` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
   `date` date NOT NULL,
+  `link` varchar(255) DEFAULT NULL,
   `description` text NOT NULL,
   `file` varchar(255) NOT NULL,
   `owner` varchar(255) NOT NULL,
-  `visibility` int(20) DEFAULT NULL
+  `visibility` int(20) NOT NULL,
+  `local_area_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Contenu de la table `photos`
 --
 
-INSERT INTO `photos` (`id`, `title`, `name`, `date`, `description`, `file`, `owner`, `visibility`) VALUES
-(19, 'PhotoTest', '14212165_1379492905441163_7402284545959690173_n.jpg', '2017-03-15', 'this is a description', 'GX3l4fZI.jpeg', 'ali', 0),
-(21, 'this is a name', 'tightropewalkers.jpg', '2017-03-15', 'this is a description', 'iC3NPOEb.jpeg', 'ali', 0),
-(25, 'hello world', '2.jpg', '2017-04-13', 'test', 'ro4DRgVa.jpeg', 'yassir2', NULL),
-(27, 'kkk', '3.jpg', '2017-04-22', 'dd', 'fHKhoovm.jpeg', 'simo', NULL);
+INSERT INTO `photos` (`id`, `title`, `name`, `date`, `link`, `description`, `file`, `owner`, `visibility`, `local_area_id`) VALUES
+(18, 'PhotoTest', '14212165_1379492905441163_7402284545959690173_n.jpg', '2017-03-15', '', 'this is a description', 'mDEAbMBr.jpeg', 'ali', 0, NULL),
+(19, 'PhotoTest', '14212165_1379492905441163_7402284545959690173_n.jpg', '2017-03-15', '', 'this is a description', 'GX3l4fZI.jpeg', 'ali', 0, NULL),
+(21, 'this is a name', 'tightropewalkers.jpg', '2017-03-15', '', 'this is a description', 'iC3NPOEb.jpeg', 'ali', 0, NULL),
+(24, 'oooooooooooooo', '12767598_1682830325319227_1382226467_n.jpg', '2017-03-21', '', 'ooooooooooooooooooo', 'sOpEIUL1.jpeg', 'yassir', 0, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `photo_category`
+--
+
+CREATE TABLE `photo_category` (
+  `photo_id` int(11) NOT NULL,
+  `category_id` int(11) NOT NULL,
+  `date_created` date NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Contenu de la table `photo_category`
+--
+
+INSERT INTO `photo_category` (`photo_id`, `category_id`, `date_created`) VALUES
+(18, 1, '2017-04-13'),
+(19, 1, '2017-04-13'),
+(19, 2, '2017-04-14');
 
 -- --------------------------------------------------------
 
@@ -119,6 +181,32 @@ INSERT INTO `photo_club` (`photo_id`, `club_id`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Structure de la table `ratings`
+--
+
+CREATE TABLE `ratings` (
+  `photo_id` int(11) NOT NULL,
+  `owner` varchar(255) NOT NULL,
+  `value` int(11) NOT NULL,
+  `description` text,
+  `date_created` date NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Contenu de la table `ratings`
+--
+
+INSERT INTO `ratings` (`photo_id`, `owner`, `value`, `description`, `date_created`) VALUES
+(2, 'ali', 3, 'description', '2017-04-13'),
+(18, 'ali', 4, 'description', '2017-04-13'),
+(19, 'ali', 5, NULL, '2017-04-14'),
+(19, 'yassir', 5, NULL, '2017-04-14'),
+(21, 'ali', 4, NULL, '2017-04-14'),
+(21, 'yassir', 5, NULL, '2017-04-14');
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table `users`
 --
 
@@ -133,9 +221,7 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`login`, `password`) VALUES
 ('ali', 'e5e9fa1ba31ecd1ae84f75caaa474f3a663f05f4'),
-('simo', '65f99581a93cf30dafc32b5c178edc6b0294a07f'),
-('yassir', '5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8'),
-('yassir2', '40bd001563085fc35165329ea1ff5c5ecbdbbeef');
+('yassir', '5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8');
 
 -- --------------------------------------------------------
 
@@ -149,8 +235,21 @@ CREATE TABLE `user_club` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
+-- Contenu de la table `user_club`
+--
+
+INSERT INTO `user_club` (`user_login`, `club_id`) VALUES
+('yassir', 6);
+
+--
 -- Index pour les tables exportées
 --
+
+--
+-- Index pour la table `categories`
+--
+ALTER TABLE `categories`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Index pour la table `clubs`
@@ -165,16 +264,34 @@ ALTER TABLE `comments`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Index pour la table `local_areas`
+--
+ALTER TABLE `local_areas`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Index pour la table `photos`
 --
 ALTER TABLE `photos`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Index pour la table `photo_category`
+--
+ALTER TABLE `photo_category`
+  ADD PRIMARY KEY (`photo_id`,`category_id`);
+
+--
 -- Index pour la table `photo_club`
 --
 ALTER TABLE `photo_club`
   ADD PRIMARY KEY (`photo_id`,`club_id`);
+
+--
+-- Index pour la table `ratings`
+--
+ALTER TABLE `ratings`
+  ADD PRIMARY KEY (`photo_id`,`owner`);
 
 --
 -- Index pour la table `users`
@@ -194,20 +311,30 @@ ALTER TABLE `user_club`
 --
 
 --
+-- AUTO_INCREMENT pour la table `categories`
+--
+ALTER TABLE `categories`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+--
 -- AUTO_INCREMENT pour la table `clubs`
 --
 ALTER TABLE `clubs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 --
 -- AUTO_INCREMENT pour la table `comments`
 --
 ALTER TABLE `comments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+--
+-- AUTO_INCREMENT pour la table `local_areas`
+--
+ALTER TABLE `local_areas`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT pour la table `photos`
 --
 ALTER TABLE `photos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
