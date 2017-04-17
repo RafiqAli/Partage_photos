@@ -3,7 +3,7 @@
 class Regex {
 
 
-	const NAME     = "[a-zA-z]{3,20}";
+	const NAME     = "[A-Za-z]+";
 
 	const EMAIL    = "^[^@]+@[^@]+\.[^@]+$";
 
@@ -22,6 +22,8 @@ class Regex {
     const FLOAT    = "[+-]?([0-9]*[.])?[0-9]+";
 
     const RICHTEXT = '[A-Za-z0-9]{2,1000}';
+
+    const DATE     = '';
 
 	public static function parseConst(string $string) {
 

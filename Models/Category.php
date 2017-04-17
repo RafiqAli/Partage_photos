@@ -17,17 +17,15 @@ class Category
 	public $description;
 	public $photo_id;
 
-	public function __construct($id = null,$name,$description,$photo_id)
+	public function __construct($id = null,$name,$description)
 	{
 		if(Regex::validate(Regex::NAME,$name) 
 			&& Regex::validate(Regex::RICHTEXT,$description) 
-				&& Regex::validate(Regex::DIGITS,$photo_id)
-					&& ($id == null || Regex::validate(Regex::DIGITS,$id)))
+				&& ($id == null|| Regex::validate(Regex::DIGITS,$id)))
 		{
 			 $this->id = $id;
 			 $this->name = $name;
 			 $this->description = $description;
-			 $this->photo_id = $photo_id;
 		}
 
 	}
@@ -47,7 +45,7 @@ class Category
 
       			$category = $category[0];
 
-	      		$category_instance = new Category($category['id'],$category['name'],$category['description'],$category['photo_id']);
+	      		$category_instance = new Category($category['id'],$category['name'],$category['description']);
 
 	      		return array('failed' => false, 'object' => $category_instance, 'error' => '');
 
@@ -80,7 +78,7 @@ class Category
 
 		  	foreach ($output as $category) {
 		  		
-		  		$list[] = new category($category['id'],$category['name'],$category['description'],$category['photo_id']);
+		  		$list[] = new category($category['id'],$category['name'],$category['description']);
 		  	}
 
 		  	return  array('failed' => false, 'objects' => $list, 'error' => '');
@@ -95,19 +93,17 @@ class Category
 	public static function create($category)
 	{
 
-		if(Regex::validate(Regex::NAME,$name) 
-			&& Regex::validate(Regex::RICHTEXT,$description) 
-				&& Regex::validate(Regex::DIGITS,$photo_id)
-					&& ($id == null || Regex::validate(Regex::DIGITS,$id)))
+		if(Regex::validate(Regex::NAME,$category['name']) 
+			&& Regex::validate(Regex::RICHTEXT,$category['description']))
 		{		
 
-			$sql = "INSERT INTO categories (name,description,photo_id) VALUES (:name,:description,:photo_id)";
+			$sql = "INSERT INTO categories (name,description) VALUES (:name,:description)";
 
-		 	$data = array(':name' => $category['name'], 'description' => $category['description'], 'photo_id' => $category['photo_id']);
+		 	$data = array(':name' => $category['name'], 'description' => $category['description']);
 
 		 	$output = Request::execute($sql,$data);
 
-		 	$category = new Category(Request::lastInsertId(),$category['name'],$category['description'],$category['photo_id']);
+		 	$category = new Category(Request::lastInsertId(),$category['name'],$category['description']);
 
 		 	return array('failed' => false, 'object' => $category, 'error' => '');
 		}
@@ -205,7 +201,7 @@ class Category
 
 	public function __toString()
 	{
-		return "Category : [id] : ".$this->id."[name] : ".$this->name." [description] : ".$this->description." [photo_id]".$this->photo_id."\n";
+		return "Category : [id] : ".$this->id."[name] : ".$this->name." [description] : ".$this->description."\n";
 	}
 }
 

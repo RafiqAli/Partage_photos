@@ -14,17 +14,16 @@ class Sort
 
 class Search
 {
-	const TEXT             = 0;
 
 	const OWNER            = 1;
 
-	const BEFORE_DATE      = 2;
+	const BEFORE_DATE     = 2;
 
 	const AFTER_DATE       = 3;
 
 	const DATE             = 4;
 
-	const BETWEEN_DATE     = 5;
+	const BETWEEN_DATES     = 5;
 
 }
 

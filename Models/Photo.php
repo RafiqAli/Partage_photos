@@ -5,6 +5,7 @@ require_once("Upload.php");
 require_once("../core/Regex.php");
 require_once("Comment.php");
 require_once("Category.php");
+require_once("Rating.php");
 require_once("../core/Enumerations.php");
 
 class Photo {
@@ -16,6 +17,9 @@ class Photo {
 	  public $date;
 	  public $file;
 	  public $description;
+	  public $visibility;
+	  public $link;
+	  public $local_area_id;
 
 
 
@@ -324,10 +328,6 @@ class Photo {
 	  } 
 
 
-// untested functions 
-
-
-
 	/*
 	 * Returns photos based on occurences with text and time
 	 *
@@ -342,48 +342,23 @@ class Photo {
 	 * 					 an empty value of the 'error' key, that contains generally
 	 * 					 a message of the probable cause of the error.  
 	 */
-	public static function neo_search(int $type,$arg1,$arg2 = null)
+	public static function neo_search_date(int $type,$arg1,$arg2 = null)
 	{
+
+		$type_format = array('failed' => true);
 
 		switch ($type)
 		{
-
-			case Search::Text :
-				
-				if(Regex::validate(Regex::TEXT,$arg1)) 
-				{
-
-					$sql = "SELECT * FROM photos p JOIN comments   c   ON (c.photo_id   = p.id)
-												   JOIN categories t   ON (t.photo_id   = p.id)
-												   JOIN ratings    r   ON (r.photo_id   = p.id)
-
-									 WHERE              p.name         LIKE '%':key'%' 
-										   		   OR   p.description  LIKE '%':key'%'
-										   		   OR   p.owner        LIKE '%':key'%'
-										   		   OR   c.content      LIKE '%':key'%'
-										   		   OR   c.owner        LIKE '%':key'%'
-										   		   OR   t.name         LIKE '%':key'%'
-										   		   OR   t.description  LIKE '%':key'%'
-										   		   OR   r.owner        LIKE '%':key'%'
-										   		   OR   r.description  LIKE '%':key'%'";
-
-					
-					$data = array(':key' => $arg1);					
-
-				}
-				else
-				{
-					$type_format = array('failed' => true, 'error' => "Argument format invalid");
-				}
-
-			break;
 			
-			case Search::BETWEEN_DATE:
+			case Search::BETWEEN_DATES:
 
-				if(Regex::validate(Regex::DATE,$arg1) && Regex::validate(Regex::DATE,$arg2))
+				if(true)//Regex::validate(Regex::DATE,$arg1) && Regex::validate(Regex::DATE,$arg2))
 				{
-					$sql = "SELECT * FROM photos p WHERE date BETWEEN:key1 AND :key2";
-					$data = array(':key1' => $arg1,':key2' => $arg2);
+					$sql = "SELECT * FROM photos p WHERE date BETWEEN :keyOne AND :keyTwo";
+
+					$data = array(':keyOne' => $arg1,':keyTwo' => $arg2);
+
+					$type_format['failed'] = false;
 				}
 				else
 				{
@@ -394,10 +369,12 @@ class Photo {
 			
 			case Search::DATE: 
 				
-				if(Regex::validate(Regex::DATE,$arg1))
+				if(true)//Regex::validate(Regex::DATE,$arg1))
 				{
-					$sql = "SELECT * FROM photos p WHERE date=:key"; 
+					$sql = "SELECT * FROM photos p WHERE date = :key"; 
 					$data = array(':key' => $arg1);
+
+					$type_format['failed'] = false;
 				}
 				else
 				{
@@ -408,10 +385,12 @@ class Photo {
 			
 			case Search::BEFORE_DATE: 
 				
-				if(Regex::validate(Regex::DATE,$arg1))
+				if(true)//Regex::validate(Regex::DATE,$arg1))
 				{
-					$sql = "SELECT * FROM photos p WHERE date<:key"; 					
+					$sql = "SELECT * FROM photos p WHERE date < :key"; 					
 					$data = array(':key' => $arg1);
+
+					$type_format['failed'] = false;
 				}
 				else
 				{
@@ -422,10 +401,12 @@ class Photo {
 			
 			case Search::AFTER_DATE: 
 
-				if(Regex::validate(Regex::DATE,$arg1))
+				if(true)//Regex::validate(Regex::DATE,$arg1))
 				{
 					$sql = "SELECT * FROM photos p WHERE date>:key"; 					
 					$data = array(':key' => $arg1);
+
+					$type_format['failed'] = false;
 				}
 				else
 				{
@@ -445,9 +426,7 @@ class Photo {
 		if($type_format['failed'] == false)
 		{
 
-
-
-			$photos = Request::execute($sql,$data);
+			$photos = Request::execute($sql,$data,true);
 
 	  		if($photos != null)
 	  		{
@@ -475,6 +454,83 @@ class Photo {
 	}
 
 
+	public static function neo_search_text($key)
+	{
+
+
+		if(Regex::validate(Regex::TEXT,$key)) 
+		{
+
+			$sql = "SELECT
+							p.id            AS photo_id,
+							p.title         AS photo_title,
+							p.name          AS photo_name,
+							p.date          AS photo_date,
+							p.link          AS photo_link,
+							p.description   AS photo_description,
+							p.file          AS photo_file,
+							p.owner         AS photo_owner,
+							p.visibility    AS photo_visibility,
+							p.local_area_id AS photo_local_area_id,
+
+							c.id            AS comment_id,
+							c.content       AS comment_content,
+							c.owner         AS comment_owner,
+
+							t.id            AS category_id,
+							t.name          AS category_name,
+							t.description   AS category_description
+
+							 FROM photos p LEFT OUTER JOIN comments       c  ON (c.photo_id     = p.id)
+										   LEFT OUTER JOIN photo_category pc ON (pc.photo_id    = p.id)
+										   LEFT OUTER JOIN categories     t  ON (pc.category_id = t.id)
+										   LEFT OUTER JOIN ratings        r  ON (r.photo_id     = p.id)
+
+							 WHERE              p.name         LIKE :key 
+							 			   OR   p.title        LIKE :key
+								   		   OR   p.description  LIKE :key
+								   		   OR   p.owner        LIKE :key
+								   		   OR   c.content      LIKE :key
+								   		   OR   c.owner        LIKE :key
+								   		   OR   t.name         LIKE :key
+								   		   OR   t.description  LIKE :key
+								   		   OR   r.owner        LIKE :key
+								   		   OR   r.description  LIKE :key";
+
+			
+			$data = array(':key' => '%' . $arg1 . '%');	
+
+			$photos = Request::execute($sql,$data,true);
+
+	  		if($photos != null)
+	  		{
+	  			$list_photos = [];
+
+	  			print_r($photos);
+
+				foreach ($photos as $photo)
+				{
+					$list_photos[] = new Photo($photo['photo_id'],$photo['photo_title'],$photo['photo_name'],$photo['photo_date'],
+											   $photo['photo_description'],$photo['photo_file'],$photo['photo_owner']);
+				}
+
+				return array('failed' => false,'objects' => $list_photos, 'error' => '');
+			}
+			else
+			{
+				return array('failed' => true, 'error' => 'Aucune photo ne correspond a votre recherche');
+			}
+
+		}
+		else
+		{
+			$type_format = array('failed' => true, 'error' => "Argument format invalid");
+		}		
+
+
+	}
+
+
 	public static function sort(int $type)
 	{
 		if(Regex::validate(Regex::DIGITS,$type))
@@ -487,11 +543,11 @@ class Photo {
 				case Sort::OLDEST    : $sql = "SELECT * FROM photos ORDER BY date ASC"; 
 				break;
 
-				case Sort::TOP_RATED : $sql = "SELECT * FROM photos p JOIN ratings r ON (p.id = r.photo_id) ORDER BY AVG(r.value) DESC";
+				case Sort::TOP_RATED : $sql = "SELECT * FROM photos p  ORDER BY (SELECT AVG(r.value) FROM ratings r WHERE r.photo_id = p.id) DESC";
 
 				break;
 
-				case Sort::LOW_RATED : $sql = "SELECT * FROM photos p JOIN ratings r ON (p.id = r.photo_id) ORDER BY AVG(r.value) ASC";
+				case Sort::LOW_RATED : $sql = "SELECT * FROM photos p  ORDER BY (SELECT AVG(r.value) FROM ratings r WHERE r.photo_id = p.id) ASC";
 				break;
 				
 				default:
@@ -501,7 +557,8 @@ class Photo {
 					break;
 			}
 
-			$sorted_photos = Request::query($sql);
+
+			$sorted_photos = Request::execute($sql);
 
 	  		if($sorted_photos != null)
 	  		{
@@ -535,8 +592,8 @@ class Photo {
 
 		$list_categories = [];
 
-		$sql = "SELECT c.id, c.name, c.description,c.photo_id
-				FROM categories c, photo_category pc WHERE pc.photo_id = '".$this->id."' ;";
+		$sql = "SELECT c.id, c.name, c.description
+				FROM categories c, photo_category pc WHERE pc.photo_id = '".$this->id."' AND c.id = pc.category_id ;";
 
 
 		$categories = Request::execute($sql);
@@ -546,7 +603,7 @@ class Photo {
 
 			foreach ($categories as $category)
 			{
-				$list_categories[] = new Category($category['id'],$category['name'],$category['description'],$category['photo_id']);
+				$list_categories[] = new Category($category['id'],$category['name'],$category['description']);
 			}
 
 			return array('failed' => false,'objects' => $list_categories, 'error' => '');
@@ -565,7 +622,7 @@ class Photo {
 	  	{
 	  		foreach ($categories as $category) {
 	  			
-	  			$sql = "INSERT INTO photo_category (photo_id,category_id) VALUES (photo_id,category_id)";
+	  			$sql = "INSERT INTO photo_category (photo_id,category_id,date_created) VALUES (:photo_id,:category_id,Now())";
 	  			$data = array(":photo_id" => $this->id,":category_id" => $category->id);
 
 	  			Request::execute($sql,$data);
@@ -576,7 +633,7 @@ class Photo {
 	  	{
 	  		$category = $categories;
  	
-			$sql = "INSERT INTO photo_category (photo_id,category_id) VALUES (photo_id,category_id)";
+			$sql = "INSERT INTO photo_category (photo_id,category_id,date_created) VALUES (:photo_id,:category_id,Now())";
   			$data = array(":photo_id" => $this->id,":category_id" => $category->id);
 
   			Request::execute($sql,$data);
@@ -589,11 +646,8 @@ class Photo {
 	  public function delete_categories($categories)
 	  {
 
-	  	if($categories == Category::ALL)
-	  	{
-	  		Request::query("DELETE FROM photo_category WHERE photo_id=".$this->id);
-	  	}
-	  	else if (is_array($categories))
+
+	  	if (is_array($categories))
 	  	{
 	  		foreach ($categories as $category) {
 	  			
@@ -615,18 +669,18 @@ class Photo {
 
 		  	$list_ratings = [];
 
-		  	$sql = "SELECT r.photo_id,r.owner,r.value,r.description,r.date_created FROM ratings r  INNER JOIN photos p ON r.photo_id = p.id HAVING r.photo_id = '".$this->id."' ;";
+		  	$sql = "SELECT r.photo_id,r.owner,r.value,r.description,r.date_created FROM ratings r JOIN photos p ON (r.photo_id = p.id) WHERE r.photo_id = '".$this->id."';";
 
 		  	$ratings = Request::execute($sql);
 
 		  	if($ratings != null)
 		  	{
-
 			  	foreach ($ratings as $rating) {
-			  	
 
-			  		$list_ratings[] = new Rating($rating['photo_id'],$rating['owner'],$rating['value'],$rating['description'],$rating['date_created']);
+			  		$list_ratings[] = new Rating($rating['photo_id'],$rating['owner'],$rating['value'],$rating['description'],$rating['date_created']); 		
 			  	}
+
+
 
 			  	return array('failed' => false, 'objects' => $list_ratings, 'error' => '');
 
@@ -647,6 +701,28 @@ class Photo {
 
 	  	return array('failed' => false, 'average' => $average_rating, 'error' => '');
 		  		  	
+	  }
+
+
+	  // under construction
+
+	  public function add_local_area($local_area)
+	  {
+	  		LocalArea::create($local_area);
+
+
+	  }
+	  public function update_local_area($local_area){}
+	  public function delete_local_area($local_area){}
+
+	  // i gone confused because we can't  [..] the constructor
+	  // with tons of attributes, so we have to define setters
+	  // and setters need to have an object not an id which 
+	  // creates a conflict between the object attribute and
+	  // the id (database-oriented) attribute
+	  public function set_local_area($local_area)
+	  {
+
 	  }
 
 }
