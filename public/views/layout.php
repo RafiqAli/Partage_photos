@@ -13,9 +13,22 @@
     <!-- Custom Fonts -->
     <link href="res/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
+    <!-- Tags -->
+    <link href="res/css/tags.css" rel="stylesheet">
+
     <!-- my style -->
     <link href="res/css/style.css" rel="stylesheet" type="text/css">
 
+    <!-- jQuery -->
+    <script src="res/js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="res/js/bootstrap.min.js"></script>
+
+    <!-- Tags -->
+    <script src="res/js/tags.js"></script>
+
+    
   </head>
 
 
@@ -37,12 +50,6 @@
 <?php  include_once("./views/elements/footer.php"); ?>
 
 </div>
-  <!-- jQuery -->
-<script src="res/js/jquery.js"></script>
 
-<!-- Bootstrap Core JavaScript -->
-<script src="res/js/bootstrap.min.js"></script>
-
-  
   <body>
 <html>

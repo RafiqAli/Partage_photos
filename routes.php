@@ -22,11 +22,14 @@ $controllers = array( 'pages'   => ['home',
                                     'mes_photos',
                                     'affiche_photo',
                                     'modif_photo',
-                                    'cherche_photo'],
+                                    'cherche_photo',
+                                    'neo_search'],
 
-                      'groups' => ['my_groups',
+                      'groups'  => ['my_groups',
                                    'show_all',
-                                   'create']
+                                   'create'],
+                                   
+                      'api'     => ['test']
                      );
 
 

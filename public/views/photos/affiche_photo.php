@@ -17,9 +17,8 @@
                       <div class="product-image">
 
                         <img <?php echo 'src="../public/res/users/'.$photo->owner.'/'.$photo->file.'"';  ?>     <?php echo 'alt="'.$photo->title.'"';  ?>
-
                             class="img img-responsive" />
-                      </div>
+                      </div>                        
                     </div>
 
                     <div class="col-md-5 col-sm-5 col-xs-12" style="border:0px solid #e5e5e5;">
@@ -46,6 +45,14 @@
                         </div>
                       </div>
 
+
+                      <div class="item form-group">
+                        <strong class="col-md-3 col-sm-3 col-xs-12" for="date">Note:
+                        </strong>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <span> <?php include 'views/elements/star_rating.php'; ?> </span>
+                        </div>
+                      </div>
 
                       <?php if ($_SESSION['user']['username'] == $photo->owner): ?>
 

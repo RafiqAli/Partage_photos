@@ -615,7 +615,7 @@ class Photo {
 
 	  }
 
-	  public function add_categorties($categories)
+	  public function add_categories($categories)
 	  {
 
 	  	if(is_array($categories))

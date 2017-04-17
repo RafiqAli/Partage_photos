@@ -18,8 +18,31 @@
         }
         else
         {
-          $_SESSION['success'] = "Photo ajoute avec succes";
-          $this->mes_photos();       
+          $tags = explode(",", $_POST['tags']);
+
+          $tagstest = true;
+
+          foreach ($tags as $tag) 
+          {
+              $cat = array('name' => $tag, 'description' => 'None');
+              $result_tag = Category::create($cat);
+              
+              if($result_tag['failed']) 
+              {
+                $_SESSION['error'] = $result['error'];
+                require_once('../public/views/elements/navbar.php');
+                require_once('views/pages/home.php');
+                $tagstest = false;
+                break;
+              }
+          }
+
+          if($tagstest)
+          {
+            $_SESSION['success'] = "Photo ajoute avec succes";
+            $this->mes_photos();
+          }   
+
         }
 
         }

@@ -20,6 +20,7 @@
 
                         </div>
                       </div>
+
                       <div class="item form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12" for="date">Date de prise<span class="required">*</span>
                         </label>
@@ -53,7 +54,22 @@
                         <input type="hidden" name="owner" value="<?php echo $_SESSION['user']['username']; ?>">
 
                         </div>
-                      </div>                                            
+                      </div>  
+
+
+                      <div class="item form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="tags">Categorie(Tags) <span class="required">*</span>
+                        </label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+
+                          <input id="tags" data-role="tagsinput" class="form-control col-md-7 col-xs-12" name="tags" required="required" type="text">
+
+
+                        </div>
+                      </div>
+
+
+                                          
                       <div class="ln_solid"></div>
                       <div class="form-group">
                         <div class="col-md-6 col-md-offset-3">
