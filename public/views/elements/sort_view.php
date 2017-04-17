@@ -2,9 +2,10 @@
       <button class="btn btn-info btn-sm dropdown-toggle" type="button" data-toggle="dropdown">Trier par:
       <span class="caret"></span></button>
       <ul class="dropdown-menu">
-        <li><a href="#" onclick="AjaxFunction('name')">Nom</a></li>
-        <li><a href="#" onclick="AjaxFunction('date')">Date</a></li>
-        <li><a href="#" onclick="AjaxFunction('owner')">Proprietaire</a></li>
+        <li><a href="#" onclick="AjaxFunction('newest')">Les plus recents</a></li>
+        <li><a href="#" onclick="AjaxFunction('oldest')">Les plus anciens</a></li>
+        <li><a href="#" onclick="AjaxFunction('best')">Les mieux notés</a></li>
+        <li><a href="#" onclick="AjaxFunction('worst')">Les moins notés</a></li>
       </ul>
     </div>
 

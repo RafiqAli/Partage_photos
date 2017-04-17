@@ -4,7 +4,7 @@
 require_once("../core/Request.php");
 require_once("../core/Regex.php");
 require_once("Photo.php");
-require_once("core/Enumerations.php");
+require_once("../core/Enumerations.php");
 
 class Rating
 {

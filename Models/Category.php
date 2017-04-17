@@ -3,7 +3,7 @@
 require_once("../core/Request.php");
 require_once("../core/Regex.php");
 require_once("Photo.php");
-require_once("core/Enumeration.php");
+require_once("../core/Enumerations.php");
 
 
 

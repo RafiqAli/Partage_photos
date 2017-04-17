@@ -5,7 +5,7 @@ require_once("Upload.php");
 require_once("../core/Regex.php");
 require_once("Comment.php");
 require_once("Category.php");
-require_once("core/Enumerations.php");
+require_once("../core/Enumerations.php");
 
 class Photo {
 
