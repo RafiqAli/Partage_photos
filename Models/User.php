@@ -9,13 +9,20 @@ require_once("Club.php");
 require_once("Rating.php");
 
 
+require_once("../Exceptions/InvalidFormatException.php");
+require_once("../Exceptions/NotFoundException.php");
+require_once("../Exceptions/NullOrUnsetException.php");
+require_once("../Exceptions/ServerFileOperationException.php");
+require_once("../Exceptions/UploadException.php");
+require_once("../Exceptions/EnumerationException.php");
+
 class User {
 
 	public $login;
 
 	public $password;
 
-	const PATH_TO_PHOTOS = "/media/ali/New Volume/Study/4iéme année/S1/PHP/Partage_photos/public/ressources/users/";
+	//const PATH_TO_PHOTOS = "/media/ali/New Volume/Study/4iéme année/S1/PHP/Partage_photos/public/ressources/users/";
 
 	private function __construct($login,$password) {
 
@@ -40,11 +47,11 @@ class User {
 				$list[] = new User($user['login'],$user['password']);
 			}
 
-		  	return  array('failed' => false, 'objects' => $list, 'error' => '');
+		  	return  $list;
 	    }
 	    else
 	    {
-	    	return array('failed' => true, 'error' => 'coudn\'t find users on database');
+	    	throw new NotFoundException('coudn\'t find users on database');
 	    } 
 
 	}
@@ -73,7 +80,7 @@ class User {
 		}
 		else
 		{
-			return array('failed' => true, 'object' => '', 'error' => 'The format of login is invalid');
+			throw new InvalidFormatException('The format of login is invalid');
 		}
 	}
 
@@ -96,17 +103,17 @@ class User {
 
 				$user_instance = new User($user['login'],$user['password']);
 
-				 return array('failed' => false, 'user' => $user_instance,'error' => '');
+				 return  $user_instance;
 			}
 			else
 			{
-				 return array('failed' => true, 'error' => 'wrong credentials or this user doesnt exist.');
+				 throw new NotFoundException('wrong credentials or this user doesnt exist.');
 			}
 
 		}
 		else
 		{
-			 return array('failed' => true, 'error' => 'the format of your input is not valid');
+			throw new InvalidFormatException('the format of your input is not valid');
 		}
 	}
 
@@ -131,11 +138,11 @@ class User {
 				$list_photos[] = new Photo($photo['id'],$photo['title'],$photo['name'],$photo['date'],$photo['description'],$photo['file'],$photo['owner']);
 			}
 
-			return array('failed' => false,'objects' => $list_photos, 'error' => '');
+			return  $list_photos;
 		}
 		else
 		{
-			return array('failed' => true, 'error' => 'this user has no photos.');
+			throw new NotFoundException('this user has no photos.');
 		}
 
 		
@@ -154,12 +161,12 @@ class User {
 
 		 	$output = Request::execute($sql,$data);
 
-		 	return array('failed' => false, 'output' => $output, 'error' => '');
+		 	return  $output;
 
 		}
 		else
 		{
-			return array('failed' => true, 'error' => 'please check the format of your fields');
+			throw new InvalidFormatException('please check the format of your fields');
 		} 
 
 	}
@@ -184,7 +191,7 @@ class User {
 		}
 		else
 		{
-			return array('failed' => true, 'error' => 'please enter a valid login or new login value');
+			throw new InvalidFormatException('please enter a valid login or new login value');
 		}
 	}
 
@@ -201,11 +208,10 @@ class User {
 
 			$output = Request::query($sql);
 
-			return array('failed' => false, 'error' => '');
 		}
 		else
 		{
-			return array('failed' => true, 'error' => 'please enter a valid password format.');
+			throw new InvalidFormatException('please enter a valid password format.');
 		}
 
 	}
@@ -234,7 +240,7 @@ class User {
 		}
 		else
 		{
-			return array('failed' => true, 'error' => 'this user has no clubs.');
+			throw new NotFoundException('this user has no clubs.');
 		}
 
 	}
@@ -255,16 +261,16 @@ class User {
       			$club = $club[0];
       			$club_instance = new Club($club['id'],$club['title'],$club['description'],$club['admin'],$this);
 
-      			return array('failed' => false,'object' => $club_instance,'error' => '');	
+      			return $club_instance;	
       		} 
 			else
 			{
-				return array('failed' => true, 'object' => '', 'error' => 'This club does not exist.');
+				throw new NotFoundException('This club does not exist.');
 			}
 		}
 		else
 		{
-			return array('failed' => true, 'object' => '', 'error' => 'The format of id is invalid');
+			throw new InvalidFormatException('The format of id is invalid');
 		}
 
 	}
@@ -279,11 +285,11 @@ class User {
 
 			$output = Request::query($sql);
 
-			return array('failed' => false, 'output' => $output, 'error' => '');
+			return  $output;
 		}
 		else
 		{
-			return array('failed' => true, 'error' => 'invalid login value');
+			throw new InvalidFormatException('invalid login value');
 		}
 	}
 
@@ -316,12 +322,12 @@ class User {
 			  		$list_ratings[] = new Rating($rating['photo_id'],$rating['owner'],$rating['value'],$rating['description'],$rating['date_created']);
 			  	}
 
-			  	return array('failed' => false, 'objects' => $list_ratings, 'error' => '');
+			  	return  $list_ratings;
 
 		  	}
 		  	else
 		  	{
-		  		return array('failed' => true, 'error' => 'no rating has been found for that user.');
+		  		throw new NotFoundException('no rating has been found for that user.');
 		  	}	  	
 
 	  }

@@ -5,6 +5,9 @@ require_once("../core/Regex.php");
 require_once("Photo.php");
 require_once("../core/Enumerations.php");
 
+require_once("../Exceptions/InvalidFormatException.php");
+require_once("../Exceptions/NotFoundException.php");
+
 
 
 class Category
@@ -47,18 +50,19 @@ class Category
 
 	      		$category_instance = new Category($category['id'],$category['name'],$category['description']);
 
-	      		return array('failed' => false, 'object' => $category_instance, 'error' => '');
+	      		return $category_instance;
 
       		}
       		else
       		{
-      			return array('failed' => true, 'error' => 'we couldn\'t find a category with this id value');
+      			throw new NotFoundException("we couldn't find a category with this id value");
+      			  
       		}
 
       	}
       	else
       	{
-      		return array('failed' => true, 'error' => 'please enter a numeric value for the id');
+      		throw new InvalidFormatException("please enter a numeric value for the id");
       	}
 
 
@@ -81,11 +85,11 @@ class Category
 		  		$list[] = new category($category['id'],$category['name'],$category['description']);
 		  	}
 
-		  	return  array('failed' => false, 'objects' => $list, 'error' => '');
+		  	return  $list;
 	    }
 	    else
 	    {
-	    	return array('failed' => true, 'error' => 'coudn\'t find categories on database');
+	    	throw new NotFoundException("we coudn't find categories on database");
 	    }
 
 	}
@@ -105,14 +109,12 @@ class Category
 
 		 	$category = new Category(Request::lastInsertId(),$category['name'],$category['description']);
 
-		 	return array('failed' => false, 'object' => $category, 'error' => '');
+		 	return  $category;
 		}
 		else
 		{
-			return array('failed' => true, 'error' => 'please check the format of your fields');
+			throw new InvalidFormatException("please check the format of your fields");
 		} 
-
-
 	}
 
 	public static function delete($id)
@@ -125,11 +127,11 @@ class Category
 
 			$output = Request::query($sql);
 
-			return array('failed' => false, 'output' => $output, 'error' => '');
+			return  $output;
 		}
 		else
 		{
-			return array('failed' => true, 'error' => 'please enter a numeric value');
+			throw new InvalidFormatException('please enter a numeric value for the id');
 		}
 
 	}
@@ -142,12 +144,10 @@ class Category
 	  		$sql = "UPDATE categories SET name = '".$name."' WHERE id = ".$this->id.";";
 
 	  		Request::query($sql);
-
-	  		return array('failed' => false, 'error' => '');
 	  	}
 	  	else
 	  	{
-	  		return array('failed' => true, 'error' => 'please make sure that you did enter a valid name');
+	  		throw new InvalidFormatException();
 	  	}
 
 	}
@@ -160,12 +160,10 @@ class Category
 	  		$sql = "UPDATE categories SET description='".$description."' WHERE id=".$this->id;
 
 	  		Request::query($sql);
-
-	  		return array('failed' => false, 'error' => '');
 	  	}
 	  	else
 	  	{
-	  		return array('failed' => true, 'error' => 'please make sure that you did enter a valid description');
+	  		throw new InvalidFormatException();
 	  	}
 
 	  }	
@@ -189,11 +187,11 @@ class Category
 				$list_photos[] = new Photo($photo['id'],$photo['title'],$photo['name'],$photo['date'],$photo['description'],$photo['file'],$photo['owner']);
 			}
 
-			return array('failed' => false,'objects' => $list_photos, 'error' => '');
+			return $list_photos;
 		}
 		else
 		{
-			return array('failed' => true, 'error' => 'this category has no photos.');
+			throw new  NotFoundException("this category has no photos.");
 		}
 
 
@@ -201,7 +199,7 @@ class Category
 
 	public function __toString()
 	{
-		return "Category : [id] : ".$this->id."[name] : ".$this->name." [description] : ".$this->description."\n";
+		return "Category : [id] : ".$this->id.", [name] : ".$this->name.", [description] : ".$this->description."\n";
 	}
 }
 

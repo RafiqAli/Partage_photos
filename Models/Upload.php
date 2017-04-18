@@ -2,6 +2,7 @@
 
 require_once("../core/Helpers.php");
 
+require_once("../Exceptions/UploadException.php");
 
 class Upload {
 
@@ -285,24 +286,32 @@ class Upload {
 
 	 		if ($user_file_name['failed'] == true) 
 	 		{
-	 			self::$errors['failed'] = $user_file_name['failed'];
-	 			self::$errors['error']  = $user_file_name['error'];
+	 			//self::$errors['failed'] = $user_file_name['failed'];
+	 			//self::$errors['error']  = $user_file_name['error'];
+
+	 			throw new UploadException($user_file_name['error']);
 	 		}	 		
 
 	 		if ($allowed_type['failed'] == true) 
 	 		{
-	 			self::$errors['failed'] = $allowed_type['failed'];
-	 			self::$errors['error']  = $allowed_type['error'];
+	 			//self::$errors['failed'] = $allowed_type['failed'];
+	 			//self::$errors['error']  = 
+
+	 			throw new UploadException($allowed_type['error']);
 	 		}			 
 			if ($allowed_size['failed'] == true) 
 			{
-				self::$errors['failed'] = $allowed_size['failed'];
-				self::$errors['error']  = $allowed_size['error'];
+				//self::$errors['failed'] = $allowed_size['failed'];
+				//self::$errors['error']  = 
+				//
+				throw new UploadException($allowed_size['error']);
 			}
 			if ($upload_dir['failed'] == true) 
 			{
-				self::$errors['failed'] = $upload_dir['failed'];
-				self::$errors['error']  = $upload_dir['error'];
+				//self::$errors['failed'] = $upload_dir['failed'];
+				//self::$errors['error']  = 
+
+				throw new UploadException($upload_dir['error']);
 			}
 
 			if (self::$errors['failed'] == false)
@@ -311,15 +320,18 @@ class Upload {
 				 self::generate_name($file);
 				 move_uploaded_file(self::$file_tmp ,self::$file_full_name); 
 				 
-				 return self::$errors;
+				 //return self::$errors;
 			
-			} else return self::$errors;   
+			} //else return self::$errors;   
 	 	
 	 	} else
 	 	  {
-	 	  	 self::$errors['failed'] = $pre_check_upload['error'];
-	 	  	 self::$errors['error'] = $pre_check_upload['error'];
-	 	  	 return self::$errors;
+	 	  	 //self::$errors['failed'] = $pre_check_upload['error'];
+	 	  	 //self::$errors['error'] = 
+
+	 	  	 throw new UploadException($pre_check_upload['error']);
+	 	  	 
+	 	  	 //return self::$errors;
 	 	  }
 	 }
 

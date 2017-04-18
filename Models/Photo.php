@@ -8,6 +8,12 @@ require_once("Category.php");
 require_once("Rating.php");
 require_once("../core/Enumerations.php");
 
+
+require_once("../Exceptions/InvalidFormatException.php");
+require_once("../Exceptions/NotFoundException.php");
+require_once("../Exceptions/NullOrUnsetException.php");
+
+
 class Photo {
 
 
@@ -51,11 +57,11 @@ class Photo {
 		  		$list[] = new Photo($photo['id'],$photo['title'],$photo['name'],$photo['date'],$photo['description'],$photo['file'],$photo['owner']);
 		  	}
 
-		  	return  array('failed' => false, 'objects' => $list, 'error' => '');
+		  	return  $list;
 	    }
 	    else
 	    {
-	    	return array('failed' => true, 'error' => 'coudn\'t find photos on database');
+	    	throw new  NotFoundException("coudn't find photos on database");
 	    } 
 
 	  }
@@ -79,12 +85,12 @@ class Photo {
 
 		  	}
 
-		  	return array('failed' => false, 'objects' => $list_comments, 'error' => '');
+		  	return  $list_comments;
 
 	  	}
 	  	else
 	  	{
-	  		return array('failed' => true, 'error' => 'no comment has been posted on this with photo.');
+	  		throw new NotFoundException('no comment has been posted on this with photo.');
 	  	}
 
 	  }
@@ -107,18 +113,18 @@ class Photo {
 
 		      		$photo_instance = new Photo($photo['id'],$photo['title'],$photo['name'],$photo['date'],$photo['description'],$photo['file'],$photo['owner']);
 
-		      		return array('failed' => false, 'object' => $photo_instance, 'error' => '');
+		      		return $photo_instance;
 
 	      		}
 	      		else
 	      		{
-	      			return array('failed' => true, 'error' => 'we couldn\'t find a picture with this id value');
+	      			throw new NotFoundException('we couldn\'t find a picture with this id value');
 	      		}
 
 	      	}
 	      	else
 	      	{
-	      		return array('failed' => true, 'error' => 'please enter a numeric value for the id');
+	      		throw new InvalidFormatException('please enter a numeric value for the id');
 	      	}
 	  }
 
@@ -141,18 +147,18 @@ class Photo {
 				$list_photos[] = new Photo($photo['id'],$photo['title'],$photo['name'],$photo['date'],$photo['description'],$photo['file'],$photo['owner']);
 			}
 
-			return array('failed' => false,'objects' => $list_photos, 'error' => '');
+			return  $list_photos;
 
   		}
   		else
   		{
-  			return array('failed' => true, 'error' => 'Aucune photo ne correspond a votre recherche');
+  			throw new NotFoundException('Aucune photo ne correspond a votre recherche');
   		}
 
   	}
   	else
   	{
-  		return array('failed' => true, 'error' => 'Veillez entrez un texte de recherche valide');
+  		throw new NotFoundException('Veillez entrez un texte de recherche valide');
   	}
 		
 	}
@@ -203,13 +209,13 @@ class Photo {
 				}
 				else
 				{
-					return array('failed' => true, 'error' =>"file identifier not found or null");	
+					throw new NullOrUnsetException("file identifier not found or null");	
 				} 
 
 			}
 			else
 			{
-				return array('failed' => true, 'error' => "some values are not set or have null values");
+				throw new NullOrUnsetException("some values are not set or have null values");
 			}
 		 
 	  }
@@ -231,7 +237,8 @@ class Photo {
 	  		else
 	  		{
 	  			Upload::close();
-	  			return array('failed' => true, 'error' => 'could not delete picture from the server, try again later');
+	  			
+	  			throw new UploadException('could not delete picture from the server, try again later');
 	  		}
 	  }
 
@@ -244,11 +251,10 @@ class Photo {
 
 	  		Request::query($sql);
 
-	  		return array('failed' => false, 'error' => '');
 	  	}
 	  	else
 	  	{
-	  		return array('failed' => true, 'error' => 'please make sure that you did enter a valid name');
+	  		throw new InvalidFormatException('please make sure that you did enter a valid name');
 	  	}
 
 	  }
@@ -262,11 +268,10 @@ class Photo {
 
 	  		Request::query($sql);
 
-	  		return array('failed' => false, 'error' => '');
 	  	}
 	  	else
 	  	{
-	  		return array('failed' => true, 'error' => 'please make sure that you did enter a valid date');
+	  		throw new InvalidFormatException('please make sure that you did enter a valid date');
 	  	}
 
 	  }
@@ -280,11 +285,10 @@ class Photo {
 
 	  		Request::query($sql);
 
-	  		return array('failed' => false, 'error' => '');
 	  	}
 	  	else
 	  	{
-	  		return array('failed' => true, 'error' => 'please make sure that you did enter a valid description');
+	  		throw new  InvalidFormatException('please make sure that you did enter a valid description');
 	  	}
 
 	  }
@@ -293,11 +297,12 @@ class Photo {
 	  public static function delete($id)
 	  {
 
+		if(Regex::validate(Regex::DIGITS,$id))
+		{
+
 	  		$photo = self::find($id);
 
-	  		if(!$photo['failed'])
-	  		{
-		  		$is_deleted = unlink(Upload::LOCAL_TARGET.$photo->owner.'/'.$photo->file);
+		  	$is_deleted = unlink(Upload::LOCAL_TARGET.$photo->owner.'/'.$photo->file);
 
 		  		if($is_deleted)
 		  		{
@@ -305,18 +310,17 @@ class Photo {
 
 		  			Request::query($sql);
 
-		  			return array('failed' => false, 'error' => '');
-
 		  		}
 		  		else
 		  		{
-		  			return array('failed' => true, 'error' => "could not delete image");
+		  			throw new ServerFileOperationException("could not delete image");
 		  		}
-		  	}
-		  	else
-		  	{
-		  		return $photo;
-		  	}
+
+		}
+		else
+		{
+			throw new InvalidFormatException('please enter a numeric value');
+		}
 
 	  }
 
@@ -345,8 +349,6 @@ class Photo {
 	public static function neo_search_date(int $type,$arg1,$arg2 = null)
 	{
 
-		$type_format = array('failed' => true);
-
 		switch ($type)
 		{
 			
@@ -358,11 +360,10 @@ class Photo {
 
 					$data = array(':keyOne' => $arg1,':keyTwo' => $arg2);
 
-					$type_format['failed'] = false;
 				}
 				else
 				{
-					$type_format = array('failed' => true, 'error' => "Argument format invalid");
+					throw new InvalidFormatException("Argument format invalid");
 				}
 
 			break;
@@ -374,11 +375,10 @@ class Photo {
 					$sql = "SELECT * FROM photos p WHERE date = :key"; 
 					$data = array(':key' => $arg1);
 
-					$type_format['failed'] = false;
 				}
 				else
 				{
-					$type_format = array('failed' => true, 'error' => "Argument format invalid");
+					 throw new InvalidFormatException("Argument format invalid");
 				}
 
 			break;
@@ -390,11 +390,10 @@ class Photo {
 					$sql = "SELECT * FROM photos p WHERE date < :key"; 					
 					$data = array(':key' => $arg1);
 
-					$type_format['failed'] = false;
 				}
 				else
 				{
-					$type_format = array('failed' => true, 'error' => "Argument format invalid");
+					throw new InvalidFormatException("Argument format invalid");
 				}
 
 			break;
@@ -410,7 +409,7 @@ class Photo {
 				}
 				else
 				{
-					$type_format = array('failed' => true, 'error' => "Argument format invalid");
+					throw new InvalidFormatException("Argument format invalid");
 				}
 
 			break;
@@ -418,13 +417,11 @@ class Photo {
 
 			default:
 				
-				return array('failed' => true,'error' => 'please make sure the value that you entered is defined as a constant in the core/Enumeration/Search class.');
+				throw new EnumerationException('please make sure the value that you entered is defined as a constant in the core/Enumeration/Search class.');
 
 				break;
 		}
 
-		if($type_format['failed'] == false)
-		{
 
 			$photos = Request::execute($sql,$data,true);
 
@@ -438,18 +435,13 @@ class Photo {
 											   $photo['description'],$photo['file'],$photo['owner']);
 				}
 
-				return array('failed' => false,'objects' => $list_photos, 'error' => '');
+				return  $list_photos;
 			}
 			else
 			{
-				return array('failed' => true, 'error' => 'Aucune photo ne correspond a votre recherche');
+				throw new  NotFoundException('Aucune photo ne correspond a votre recherche');
 			}
 		
-		}
-		else
-		{
-			return $type_format;
-		}
 
 	}
 
@@ -514,17 +506,17 @@ class Photo {
 											   $photo['photo_description'],$photo['photo_file'],$photo['photo_owner']);
 				}
 
-				return array('failed' => false,'objects' => $list_photos, 'error' => '');
+				return  $list_photos;
 			}
 			else
 			{
-				return array('failed' => true, 'error' => 'Aucune photo ne correspond a votre recherche');
+				throw new NotFoundException('Aucune photo ne correspond a votre recherche');
 			}
 
 		}
 		else
 		{
-			$type_format = array('failed' => true, 'error' => "Argument format invalid");
+			throw new InvalidFormatException("Argument format invalid");
 		}		
 
 
@@ -552,7 +544,7 @@ class Photo {
 				
 				default:
 					
-					return array('failed' => true,'error' => 'please make sure the value that you entered is defined as a constant in the core/Enumeration/Sort class.');
+					throw new EnumerationException('please make sure the value that you entered is defined as a constant in the core/Enumeration/Sort class.');
 
 					break;
 			}
@@ -570,17 +562,17 @@ class Photo {
 											   $photo['description'],$photo['file'],$photo['owner']);
 				}
 
-				return array('failed' => false,'objects' => $list_photos, 'error' => '');
+				return  $list_photos;
 			}
 			else
 			{
-				return array('failed' => true, 'error' => 'No photo had been found on the database.');
+				throw new NotFoundException('No photo had been found on the database.');
 			}
 
 		}
 		else
 		{
-			return array('failed' => true,'error' => 'please make sure you entered a valid numeric value.');
+			throw new InvalidFormatException('please make sure you entered a valid numeric value.');
 		}
 
 	}
@@ -606,11 +598,11 @@ class Photo {
 				$list_categories[] = new Category($category['id'],$category['name'],$category['description']);
 			}
 
-			return array('failed' => false,'objects' => $list_categories, 'error' => '');
+			return  $list_categories;
 		}
 		else
 		{
-			return array('failed' => true, 'error' => 'this photo has no categories.');
+			throw new NotFoundException('this photo has no categories.');
 		}
 
 	  }
@@ -682,12 +674,12 @@ class Photo {
 
 
 
-			  	return array('failed' => false, 'objects' => $list_ratings, 'error' => '');
+			  	return  $list_ratings;
 
 		  	}
 		  	else
 		  	{
-		  		return array('failed' => true, 'error' => 'no rating has been posted on this with photo.');
+		  		throw new NotFoundException('no rating has been posted on this with photo.');
 		  	}	  	
 
 	  }
@@ -699,7 +691,7 @@ class Photo {
 
 	  	$average_rating = Request::execute($sql);
 
-	  	return array('failed' => false, 'average' => $average_rating, 'error' => '');
+	  	return $average_rating;
 		  		  	
 	  }
 

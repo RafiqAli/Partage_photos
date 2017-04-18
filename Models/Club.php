@@ -4,6 +4,9 @@ require_once("../core/enable_errors.php");
 require_once("../core/Request.php");
 require_once("../core/Regex.php");
 
+require_once("../Exceptions/InvalidFormatException.php");
+require_once("../Exceptions/NotFoundException.php");
+
 
 class Club {
 
@@ -53,18 +56,18 @@ class Club {
 
 		      		$club_instance = new club($club['id'],$club['title'],$club['admin'],$club['description']);
 
-		      		return array('failed' => false, 'object' => $club_instance, 'error' => '');
+		      		return  $club_instance;
 
 	      		}
 	      		else
 	      		{
-	      			return array('failed' => true, 'error' => 'we couldn\'t find a group with this id value');
+	      			throw new NotFoundException("we couldn't find a group with this id value");
 	      		}
 
 	      	}
 	      	else
 	      	{
-	      		return array('failed' => true, 'error' => 'please enter a numeric value for the id');
+	      		throw new InvalidFormatException('please enter a numeric value for the id');
 	      	}
 
 
@@ -93,9 +96,8 @@ class Club {
 	    }
 	    else
 	    {
-	    	return array('failed' => true, 'error' => 'coudn\'t find clubs on database');
+	    	throw new NotFoundException("coudn't find clubs on database");
 	    }
-
 
 	}
 
@@ -120,11 +122,11 @@ class Club {
 				$list_users[] = new User($user['login'],null);
 			}
 
-			return array('failed' => false,'objects' => $list_users, 'error' => '');
+			return  $list_users;
 		}
 		else
 		{
-			return array('failed' => true, 'error' => 'this group has no users.');
+			throw new NotFoundException("this group has no users.");
 		}
 
 
@@ -150,11 +152,11 @@ class Club {
 				$list_photos[] = new Photo($photo['id'],$photo['title'],$photo['name'],$photo['date'],$photo['description'],$photo['file'],$photo['owner']);
 			}
 
-			return array('failed' => false,'objects' => $list_photos, 'error' => '');
+			return $list_photos;
 		}
 		else
 		{
-			return array('failed' => true, 'error' => 'this group has no photos.');
+			throw new NotFoundException("this group has no photos.");
 		}
 	}
 
@@ -179,12 +181,12 @@ class Club {
 
 		 	$output = Request::execute($sql,$data);
 
-		 	return array('failed' => false, 'output' => $output, 'error' => '');
+		 	return $output;
 
 		}
 		else
 		{
-			return array('failed' => true, 'error' => 'please check the format of your fields');
+			throw new InvalidFormatException("please check the format of your fields");
 		} 
 	}
 
@@ -194,22 +196,11 @@ class Club {
 
 		$photo = Photo::create($photo['info'],$photo['file']);
 
-		if($photo['failed'] == false)
-		{
-			$sql = "INSERT INTO photo_club (photo_id,club_id) VALUES (:photo_id,:club_id)";
+		$sql = "INSERT INTO photo_club (photo_id,club_id) VALUES (:photo_id,:club_id)";
 
-			$data = array('photo_id' => $photo['object']->id,'club_id' => $this->id);
+		$data = array('photo_id' => $photo['object']->id,'club_id' => $this->id);
 
-			Request::execute($sql,$data);
-
-			return array('failed' => false, 'error' => '');
-
-		}
-		else
-		{
-			return array('failed' => true, 'error' => $photo['error']);
-
-		}
+		Request::execute($sql,$data);
 
 	}
 
@@ -229,12 +220,10 @@ class Club {
 
 			Request::execute($sql,$data);
 
-			return array('failed' => false, 'error' => '');
-
 		}
 		else
 		{
-			return array('failed' => true, 'error' => 'this user does not exist in our database.');
+			throw new  NotFoundException("this user does not exist in our database.");
 		}
 
 	}
@@ -255,7 +244,7 @@ class Club {
 		}
 		else
 		{
-			return array('failed' => true, 'error' => 'please enter a numeric value');
+			 throw new InvalidFormatException('please enter a numeric value');
 		}
 
 	}

@@ -6,6 +6,15 @@ require_once("../core/Regex.php");
 require_once("Photo.php");
 require_once("../core/Enumerations.php");
 
+
+require_once("../Exceptions/InvalidFormatException.php");
+require_once("../Exceptions/NotFoundException.php");
+require_once("../Exceptions/NullOrUnsetException.php");
+require_once("../Exceptions/ServerFileOperationException.php");
+require_once("../Exceptions/UploadException.php");
+require_once("../Exceptions/EnumerationException.php");
+
+
 class Rating
 {
 
@@ -39,7 +48,7 @@ class Rating
 		}
 		else
 		{
-			return array('failed' => true, 'error' => "some values are not set or have null values");
+			throw new NullOrUnsetException("some values are not set or have null values");
 		}
 
 
@@ -63,11 +72,11 @@ class Rating
 		  		$list[] = new Rating($rating['photo_id'],$rating['owner'],$rating['value'],$rating['description']);
 		  	}
 
-		  	return  array('failed' => false, 'objects' => $list, 'error' => '');
+		  	return   $list;
 	    }
 	    else
 	    {
-	    	return array('failed' => true, 'error' => 'coudn\'t find ratings on database');
+	    	throw new NotFoundException('coudn\'t find ratings on database');
 	    }
 
 	}
@@ -91,18 +100,18 @@ class Rating
 
 	      		$rating_instance = new Rating($rating['photo_id'],$rating['owner'],$rating['value'],$rating['description']);
 
-	      		return array('failed' => false, 'object' => $rating_instance, 'error' => '');
+	      		return $rating_instance;
 
       		}
       		else
       		{
-      			return array('failed' => true, 'error' => 'we couldn\'t find a rating with this id value');
+      			throw new NotFoundException('we couldn\'t find a rating with this id value');
       		}
 
       	}
       	else
       	{
-      		return array('failed' => true, 'error' => 'please enter a numeric value for the id');
+      		throw new InvalidFormatException('please enter a numeric value for the id');
       	}
 
 	}
@@ -124,13 +133,13 @@ class Rating
 
 		 	$rating = new Rating($rating['photo_id'],$rating['owner'],$rating['value'],$rating['description']);
 
-		 	return array('failed' => false, 'object' => $rating, 'error' => '');
+		 	return  $rating;
 
 
 		}
 		else
 		{
-			return array('failed' => true, 'error' => 'please check the format of your fields');
+			throw new InvalidFormatException();
 		}	
 
 	}
@@ -147,7 +156,7 @@ class Rating
 	  	}
 	  	else
 	  	{
-	  		return array('failed' => true, 'error' => 'please make sure that you did enter a valid value');
+	  		throw new InvalidFormatException('please make sure that you did enter a valid value');
 	  	}
 
 	} 
@@ -160,11 +169,11 @@ class Rating
 
 	  		Request::query($sql);
 
-	  		return array('failed' => false, 'error' => '');
+
 	  	}
 	  	else
 	  	{
-	  		return array('failed' => true, 'error' => 'please make sure that you did enter a valid description');
+	  		throw new InvalidFormatException('please make sure that you did enter a valid description');
 	  	}
 
 	} 
@@ -180,11 +189,11 @@ class Rating
 
 			$output = Request::query($sql);
 
-			return array('failed' => false, 'output' => $output, 'error' => '');
+			return  $output;
 		}
 		else
 		{
-			return array('failed' => true, 'error' => 'please enter a numeric value');
+			throw new InvalidFormatException('please enter a numeric value');
 		}		
 
 	}
