@@ -96,7 +96,6 @@ class Category
 
 	public static function create($category)
 	{
-
 		if(Regex::validate(Regex::NAME,$category['name']) 
 			&& Regex::validate(Regex::RICHTEXT,$category['description']))
 		{		

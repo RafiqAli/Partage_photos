@@ -92,7 +92,7 @@ class Club {
 		  		$list[] = new club($club['id'],$club['title'],$club['admin'],$club['description']);
 		  	}
 
-		  	return  array('failed' => false, 'objects' => $list, 'error' => '');
+		  	return  $list;
 	    }
 	    else
 	    {
