@@ -29,8 +29,10 @@ if (isset($images))
         <p>
 
           <a <?php echo 'href="?controller=photos&action=affiche_photo&id='.$image->id.'"';  ?>class="btn btn-primary" role="button"><span class="fa fa-eye" aria-hidden="true"></span></a>
-          <a <?php echo 'href="?controller=photos&action=modif_photo&id='.$image->id.'"';  ?>
+          <?php if ($image->owner == $_SESSION['user']['username']): ?>
+            <a <?php echo 'href="?controller=photos&action=modif_photo&id='.$image->id.'"';  ?>
            class="btn btn-default" role="button"><span class="glyphicon glyphicon-pencil"></span></a>
+          <?php endif ?>
 
         </p>
       </div>

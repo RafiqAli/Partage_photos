@@ -2,17 +2,17 @@
       <button class="btn btn-info btn-sm dropdown-toggle" type="button" data-toggle="dropdown">Trier par:
       <span class="caret"></span></button>
       <ul class="dropdown-menu">
-        <li><a href="#" onclick="AjaxFunction('newest')">Les plus recents</a></li>
-        <li><a href="#" onclick="AjaxFunction('oldest')">Les plus anciens</a></li>
-        <li><a href="#" onclick="AjaxFunction('best')">Les mieux notés</a></li>
-        <li><a href="#" onclick="AjaxFunction('worst')">Les moins notés</a></li>
+        <li><a href="#" onclick="AjaxFunction('newest', '<?= $_SESSION['user']['username'] ?>')">Les plus recents</a></li>
+        <li><a href="#" onclick="AjaxFunction('oldest', '<?= $_SESSION['user']['username'] ?>')">Les plus anciens</a></li>
+        <li><a href="#" onclick="AjaxFunction('best',   '<?= $_SESSION['user']['username'] ?>')">Les mieux notés</a></li>
+        <li><a href="#" onclick="AjaxFunction('worst',  '<?= $_SESSION['user']['username'] ?>')">Les moins notés</a></li>
       </ul>
     </div>
 
 
 
 <script>
-function AjaxFunction(str) {
+function AjaxFunction(str, user) {
 
 if(str != "")
 {
@@ -21,7 +21,7 @@ if(str != "")
 	//fichier php qui traite la requete
 	var url = "/Partage_photos/controllers/ajax_sort.php";
 	//parametres a envoyer
-	var params = "type="+str;
+	var params = "type="+str+"&username="+user;
 
     if (window.XMLHttpRequest) {
     	// code for IE7+, Firefox, Chrome, Opera, Safari
