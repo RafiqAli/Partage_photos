@@ -29,16 +29,28 @@ $controllers = array( 'pages'   => ['home',
                                    'show_all',
                                    'create'],
                                    
-                      'api'     => ['test']
+                      'api'     => ['logIn',
+                                    'logOut',
+                                    'signIn',
+                                    'getAllPhotos',
+                                    'getPhotosByUser',
+                                    'addPhoto',
+                                    'modifyPhoto',
+                                    'addToFavorite',
+                                    'getInfosByImage',
+                                    'search',
+                                    'notePhoto']
                      );
 
 
+//Function call qui appelle les methodes des actions
 
 function call($controller, $action) 
 {
   require_once('controllers/' . $controller . '_controller.php');
 
-  switch($controller) {
+  switch($controller) 
+  {
 
 //------------------------------------------------------------------------
 
@@ -46,7 +58,6 @@ function call($controller, $action)
       if($action=='login' || $action=='register')
       {
           require_once('Models/User.php');
-
       }
       $controller = new PagesController();
     break;
@@ -70,11 +81,17 @@ function call($controller, $action)
       $controller = new GroupsController();
 
     break;
+
+    case 'api':
+      $controller = new ApiController();
+    break;
+
   }
 
 //---------------------------------------------------------------------------
 
   $controller->{ $action }();
+
 }
 
 
@@ -93,6 +110,5 @@ else
 {
   call('pages', 'error');
 }
-
 
 ?>
