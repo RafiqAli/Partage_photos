@@ -18,203 +18,212 @@
 
 */
 
-//Fonction d'autentification
-public function logIn()
+/**
+* Class api
+*/
+class ApiController
 {
-	require_once('../Models/User.php');
 
-	$username = test_input($_GET['username']);
-	$password = test_input($_GET['password']);
-	if(!empty($username) && !empty($password))
+	//Fonction d'autentification
+	public function logIn()
 	{
-		try
+		require_once('../Models/User.php');
+
+		$username = test_input($_GET['username']);
+		$password = test_input($_GET['password']);
+		if(!empty($username) && !empty($password))
 		{
-			$userInstance = User::find($username);
-			if($userInstance->password == $password)
+			try
 			{
-				$response = json_encode($userInstance);
+				$userInstance = User::find($username);
+
+				if($userInstance->password == $password)
+				{
+					$response = json_encode($userInstance);
+				}
+				else
+				{
+					$response = " { 'error': 'Mot de passe non valide!' } ";
+				}
+			}
+			catch(Exception $e)
+			{
+				$message = $e->getMessage();
+				$response = "{ 'exception': '$message' }";
 			}
 		}
-		catch(APIException $e)
+		else
 		{
-			$message = $e->getMessage();
-			$response = "{ 'exception': '$message' }";
+			$response = " { 'error': 'Veuillez remplir tous les champs!' } ";
 		}
+
+		echo $response;
 	}
-	else
+	////////////////////////////////////////////////////////////////////////
+
+	//Fonction de deconnexion
+	public function logOut()
 	{
-		$response = " { 'error': 'Veuillez remplir tous les champs!' } ";
+		//cette fonction sera impelementé directement dans Android
 	}
-	echo $response;
-}
-////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////
 
-//Fonction de deconnexion
-public function logOut()
-{
-	//cette fonction sera impelementé directement dans Android
-}
-////////////////////////////////////////////////////////////////////////
-
-//Fonction d'enregistrement
-public function SignIn()
-{
-	require_once('../Models/User.php');
-
-	$username = test_input($_GET['username']);
-	$password = test_input($_GET['password']);
-	if(!empty($username) && !empty($password))
+	//Fonction d'enregistrement
+	public function SignIn()
 	{
+		require_once('../Models/User.php');
+
+		$username = test_input($_GET['username']);
+		$password = test_input($_GET['password']);
+
+		if(!empty($username) && !empty($password))
+		{
+			try
+			{
+				$user = array('login' => $username, 'password' => $password);
+				$result = User::create($user);
+				$response = " { 'success': 'Bienvenue!' } ";
+
+			}
+			catch(APIException $e)
+			{
+				$message = $e->getMessage();
+				$response = "{ 'exception': '$message' }";
+			}
+		}
+		echo $response;
+	}
+	///////////////////////////////////////////////////////////////
+
+	//Retourne toutes les photos
+	public function getAllPhotos()
+	{
+		require_once('../Models/Photo.php');	
 		try
 		{
-			$user = array('login' => $username, 'password' => $password);
-			$result = User::create($user);
-			$response = " { 'success': 'Bienvenue!' } ";
-
+			$images = Photo::all();
+			$response = json_encode($images);
 		}
 		catch(APIException $e)
 		{
 			$message = $e->getMessage();
 			$response = "{ 'exception': '$message' }";
 		}
+		echo $response;
 	}
-	echo $response;
-}
-///////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////
 
-//Retourne toutes les photos
-public function getAllPhotos()
-{
-	require_once('../Models/Photo.php');	
-	try
+	//Retourne photo par utilisateur
+	public function getPhotosByUser()
 	{
-		$photos_result = Photo::all();
-		$images = $photos_result['objects'];
-		$response = json_encode($images);
-	}
-	catch(APIException $e)
-	{
-		$message = $e->getMessage();
-		$response = "{ 'exception': '$message' }";
-	}
-	echo $response;
-}
-/////////////////////////////////////////////////////////////
+		require_once('../Models/User.php');
 
-//Retourne photo par utilisateur
-public function getPhotosByUser()
-{
-	require_once('../Models/User.php');
-
-	$username = test_input($_GET['username']);
-	
-	if(!empty($username))
-	{
-		try 
+		$username = test_input($_GET['username']);
+		
+		if(!empty($username))
 		{
-			$user_result = User::find($username);
-			$photos_result = $user_result['object']->photos();
-			$images = $photos_result['objects'];
-			$response = json_encode($images);
-		} 
-		catch (APIException $e) 
-		{
-			$response = '{ "exception": "'.($e->getMessage()).'" } ';
+			try 
+			{
+				$userInstance = User::find($username);
+				$images = $userInstance->photos();
+				$response = json_encode($images);
+			} 
+			catch (APIException $e) 
+			{
+				$response = '{ "exception": "'.($e->getMessage()).'" } ';
+			}
 		}
-	}
-	else
-	{
-		$response = ' { "error": "Veuillez indiquer un utilisateur valide!" } ';
-	}
-	echo $response;
-}
-/////////////////////////////////////////////////////////////////////
-
-//Ajoute photo dans la base de donnees
-public function addPhoto()
-{
-
-}
-/////////////////////////////////////////////////////////////////////
-
-//Modifie les informations de photo
-public function modifyPhoto()
-{
-
-}
-/////////////////////////////////////////////////////////////////
-
-//Ajoute aux favoris
-public function addToFavorite()
-{
-
-}
-/////////////////////////////////////////////////////////////
-
-//Renvoie les infos d'une image et ses commentaires
-public function getInfosByImage()
-{
-	require_once('../Models/Photo.php');
-
-	$photoID = test_input($_GET['photoID']);
-	
-	if(!empty($photoID))
-	{
-		try 
+		else
 		{
-			$photo_result = Photo::find($photoID);
-			$photo = $photo_result['object'];
-
-            $comment_result = $photo->comments();
-            $comments = $comment_result['objects'];
-
-            $infos = json_encode($photo);
-			$comments = json_encode($comments);
-
-			$response = " {'infos': '$infos', 'comments': '$comments'} "
-		} 
-		catch (APIException $e) 
-		{
-			$response = '{ "exception": "'.($e->getMessage()).'" } ';
+			$response = ' { "error": "Veuillez indiquer un utilisateur valide!" } ';
 		}
+		echo $response;
 	}
-	else
+	/////////////////////////////////////////////////////////////////////
+
+	//Ajoute photo dans la base de donnees
+	public function addPhoto()
 	{
-		$response = ' { "error": "Veuillez indiquer un ID de photo valide!" } ';
+
 	}
-	echo $response;
-}
+	/////////////////////////////////////////////////////////////////////
 
-public function search()
-{
-	require_once('../Models/Photo.php');
-
-	$keywords = test_input($_GET['keywords']);
-	
-	if(!empty($keywords))
+	//Modifie les informations de photo
+	public function modifyPhoto()
 	{
-		try 
+
+	}
+	/////////////////////////////////////////////////////////////////
+
+	//Ajoute aux favoris
+	public function addToFavorite()
+	{
+
+	}
+	/////////////////////////////////////////////////////////////
+
+	//Renvoie les infos d'une image et ses commentaires
+	public function getInfosByImage()
+	{
+		require_once('../Models/Photo.php');
+
+		$photoID = test_input($_GET['photoID']);
+		
+		if(!empty($photoID))
 		{
-	        $photo_result = Photo::search($keywords);
-			$images = $photo_result['objects'];
-			$response = json_encode($images);
-		} 
-		catch (APIException $e) 
-		{
-			$response = '{ "exception": "'.($e->getMessage()).'" } ';
+			try 
+			{
+				$photo = Photo::find($photoID);
+
+	            $comments = $photo->comments();
+
+	            $infos = json_encode($photo);
+				$comments = json_encode($comments);
+
+				$response = " {'infos': '$infos', 'comments': '$comments'} ";
+			} 
+			catch (APIException $e) 
+			{
+				$response = '{ "exception": "'.($e->getMessage()).'" } ';
+			}
 		}
+		else
+		{
+			$response = ' { "error": "Veuillez indiquer un ID de photo valide!" } ';
+		}
+		echo $response;
 	}
-	else
+
+	public function search()
 	{
-		$response = ' { "error": "Veuillez indiquer une valeur de recherche!" } ';
+		require_once('../Models/Photo.php');
+
+		$keywords = test_input($_GET['keywords']);
+		
+		if(!empty($keywords))
+		{
+			try 
+			{
+		        $images = Photo::search($keywords);
+				$response = json_encode($images);
+			} 
+			catch (APIException $e) 
+			{
+				$response = '{ "exception": "'.($e->getMessage()).'" } ';
+			}
+		}
+		else
+		{
+			$response = ' { "error": "Veuillez indiquer une valeur de recherche!" } ';
+		}
+		echo $response;
 	}
-	echo $response;
+
+	public function notePhoto()
+	{
+
+	}
+
 }
-
-public function notePhoto()
-{
-
-}
-
 
 ?>

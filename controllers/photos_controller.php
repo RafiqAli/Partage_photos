@@ -8,201 +8,134 @@
       if (isset($_POST['submit_addphoto']))
       {
 
-        $result = Photo::create($_POST, $_FILES);
-  
-        if ($result['failed']) 
+        try
         {
-          $_SESSION['error'] = $result['error'];
-          require_once('../public/views/elements/navbar.php');
-          require_once('views/pages/home.php'); 
-        }
-        else
-        {
+
+          $result = Photo::create($_POST, $_FILES);
           $tags = explode(",", $_POST['tags']);
-
-          $tagstest = true;
-
           foreach ($tags as $tag) 
           {
               $cat = array('name' => $tag, 'description' => 'None');
               $result_tag = Category::create($cat);
-              
-              if($result_tag['failed']) 
-              {
-                $_SESSION['error'] = $result['error'];
-                require_once('../public/views/elements/navbar.php');
-                require_once('views/pages/home.php');
-                $tagstest = false;
-                break;
-              }
           }
-
-          if($tagstest)
-          {
-            $_SESSION['success'] = "Photo ajoute avec succes";
-            $this->mes_photos();
-          }   
+          $_SESSION['success'] = "Photo ajoute avec succes";
+          $this->mes_photos();
 
         }
-
-        }
-        else
+        catch (Exception $e)
         {
+
+          $_SESSION['error'] = $e->getMessage();
           require_once('../public/views/elements/navbar.php');
-          require_once('views/pages/error.php');
+          require_once('views/pages/home.php'); 
+
         }
+      }
     }
 
 
     public function mes_photos() {
 
-      $user_result = User::find($_SESSION['user']['username']);
-
-      if ($user_result['failed']) 
+      try
       {
-            $_SESSION['error'] = $user_result['error'];
-            require_once('../public/views/elements/navbar.php');
-            require_once('views/pages/home.php'); 
+        $userInstance = User::find($_SESSION['user']['username']);
+        $images = $userInstance->photos();
+        require_once('../public/views/elements/navbar.php');
+        require_once('views/photos/mes_photos.php');
       }
-      else
+      catch(Exception $e)
       {
-            $photos_result = $user_result['object']->photos();
-
-            if($photos_result['failed'])
-            {
-              $_SESSION['error'] = $photos_result['error'];
-              require_once('../public/views/elements/navbar.php');
-              require_once('views/pages/home.php');
-            }
-            else
-            {
-              $images = $photos_result['objects'];
-              require_once('../public/views/elements/navbar.php');
-              require_once('views/photos/mes_photos.php'); 
-            }    
+        $_SESSION['error'] = $e->getMessage();
+        require_once('../public/views/elements/navbar.php');
+        require_once('views/pages/home.php'); 
       }
 
     }
 
     public function affiche_photo() 
     {
-      $photo_result = Photo::find($_GET['id']);
-
-      if ($photo_result['failed']) 
+      if(!empty($_GET['id']))
       {
-            $_SESSION['error'] = $photo_result['error'];
-            require_once('../public/views/elements/navbar.php');
-            require_once('views/pages/home.php'); 
+        try
+        {
+          $photo = Photo::find($_GET['id']);
+          $comments = $photo->comments();
+          require_once('../public/views/elements/navbar.php');
+          require_once('views/photos/affiche_photo.php'); 
+        }
+        catch (Exception $e)
+        {
+          $_SESSION['error'] = $e->getMessage();
+          require_once('../public/views/elements/navbar.php');
+          require_once('views/pages/home.php'); 
+        }
       }
       else
       {
-            $photo = $photo_result['object'];
-            $comment_result = $photo->comments();
-            
-            if($comment_result['failed'])
-            {
-              $_SESSION['info'] = $comment_result['error'];
-              require_once('../public/views/elements/navbar.php');
-              require_once('views/photos/affiche_photo.php');  
-            }
-            else
-            {
-              $comments = $comment_result['objects'];
-              require_once('../public/views/elements/navbar.php');
-              require_once('views/photos/affiche_photo.php');             
-            }
-      }      
+        $_SESSION['error'] = 'Veillez indiquer un id de photo valide!';
+        require_once('../public/views/elements/navbar.php');
+        require_once('views/pages/home.php');
+      }
+
     }
 
 
     public function modif_photo() 
     {
-      if (isset($_POST['submit_modif']))
+      try
       {
+          if (isset($_POST['submit_modif']))
+          {
+              $id = test_input($_POST['photo_id']);
+              $title = test_input($_POST['title']);
+              $date = test_input($_POST['date']);
+              $desc = test_input($_POST['desc']);
 
-        $id = $_POST['photo_id'];
-        $photo_result = Photo::find($id);
+              $photo = Photo::find($id);
 
-        if($photo_result['failed'])
-        {
-            $_SESSION['error'] = $photo_result['error'];
-            require_once('../public/views/elements/navbar.php');
-            require_once('views/pages/home.php'); 
-        }
-        else
-        {
-            $photo = $photo_result['object'];
-
-            if (isset($_POST['title'])) 
-            {
-               $title = $_POST['title'];
-               $photo->update_title($title);
-            }
-            
-            if(isset($_POST['date']))
-            {
-              $date = $_POST['date'];
+              $photo->update_title($title);
               $photo->update_date($date);
-            }
-
-            if(isset($_POST['desc']))
-            {
-              $desc = $_POST['desc'];
               $photo->update_description($desc);
-            }
 
-            $_SESSION['success'] = "Champs modifies avec succes";
-            require_once('pages_controller.php');
-            $pages = new PagesController();
-            $pages->home();
-        }    
-        
+              $_SESSION['success'] = "Champs modifies avec succes";
+              require_once('pages_controller.php');
+              $pages = new PagesController();
+              $pages->home();        
+          }
+          else
+          {
+            $photo = Photo::find($_GET['id']);
+            require_once('../public/views/elements/navbar.php');
+            require_once('views/photos/modif_photo.php');   
+          }
       }
-      else
+      catch (Exception $e)
       {
-
-        $photo_result = Photo::find($_GET['id']);
-
-        if ($photo_result['failed']) 
-        {
-              $_SESSION['error'] = $photo_result['error'];
-              require_once('../public/views/elements/navbar.php');
-              require_once('views/pages/home.php'); 
-        }
-        else
-        {
-              $photo = $photo_result['object'];
-              require_once('../public/views/elements/navbar.php');
-              require_once('views/photos/modif_photo.php');  
-        }   
+          $_SESSION['error'] = $e->getMessage();
+          require_once('../public/views/elements/navbar.php');
+          require_once('views/pages/home.php'); 
       }
-
     }
 
     public function cherche_photo()
     {
-      if(isset($_POST['submit_recherche']))
+      try
       {
-        $mot_cle = $_POST['mot_cle'];
-        echo $mot_cle;
-
-        $photo_result = Photo::search($mot_cle);
-
-        if ($photo_result['failed']) 
+        if(isset($_POST['submit_recherche']))
         {
-          $_SESSION['info'] = $photo_result['error'];
+          $mot_cle = test_input($_POST['mot_cle']);
+          $images = Photo::search($mot_cle);
           require_once('../public/views/elements/navbar.php');
-          require_once('views/pages/home.php'); 
-        }
-        else
-        {
-          $images = $photo_result['objects'];
-          require_once('../public/views/elements/navbar.php');
-          require_once('views/photos/recherche.php');             
-
+          require_once('views/photos/recherche.php'); 
         }
 
-        }
+      }
+      catch (Exception $e)
+      {
+        $_SESSION['error'] = $e->getMessage();
+        require_once('../public/views/elements/navbar.php');
+        require_once('views/pages/home.php'); 
+      }
     }
 
   }
