@@ -71,11 +71,11 @@ class User {
       			$user = $user[0];
       			$user_instance = new User($user['login'],$user['password']);
 
-      			return array('failed' => false,'object' => $user_instance,'error' => '');	
+      			return  $user_instance;	
       		} 
 			else
 			{
-				return array('failed' => true, 'object' => '', 'error' => 'This login is either wrong or does not exist.');
+				throw new NotFoundException('This login is either wrong or does not exist.');
 			}
 		}
 		else
@@ -236,7 +236,8 @@ class User {
 				$list_clubs[] = new Club($club['id'],$club['title'],$club['description'],$club['admin']);
 			}
 
-			return array('failed' => false,'objects' => $list_clubs, 'error' => '');
+			return $list_clubs
+			;
 		}
 		else
 		{

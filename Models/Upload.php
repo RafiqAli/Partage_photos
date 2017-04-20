@@ -208,7 +208,7 @@ class Upload {
 
     	$failed = false;
     	$error = "";
-    	$target = $_SERVER['DOCUMENT_ROOT']."/Partage_photos/".self::LOCAL_TARGET . $destination;
+    	$target = $_SERVER['DOCUMENT_ROOT']."/".self::LOCAL_TARGET . $destination;
 
     	if(file_exists($target))
     	{
@@ -319,6 +319,8 @@ class Upload {
 
 				 self::generate_name($file);
 				 move_uploaded_file(self::$file_tmp ,self::$file_full_name); 
+
+				 return self::$file_full_name;
 				 
 				 //return self::$errors;
 			

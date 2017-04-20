@@ -10,8 +10,6 @@ require_once("../core/Enumerations.php");
 require_once("../Exceptions/InvalidFormatException.php");
 require_once("../Exceptions/NotFoundException.php");
 require_once("../Exceptions/NullOrUnsetException.php");
-require_once("../Exceptions/ServerFileOperationException.php");
-require_once("../Exceptions/UploadException.php");
 require_once("../Exceptions/EnumerationException.php");
 
 
@@ -152,7 +150,6 @@ class Rating
 
 	  		Request::query($sql);
 
-	  		return array('failed' => false, 'error' => '');
 	  	}
 	  	else
 	  	{

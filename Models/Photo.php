@@ -12,6 +12,9 @@ require_once("../core/Enumerations.php");
 require_once("../Exceptions/InvalidFormatException.php");
 require_once("../Exceptions/NotFoundException.php");
 require_once("../Exceptions/NullOrUnsetException.php");
+require_once("../Exceptions/ServerFileOperationException.php");
+require_once("../Exceptions/UploadException.php");
+require_once("../Exceptions/EnumerationException.php");
 
 
 class Photo {
@@ -177,9 +180,6 @@ class Photo {
 
 				  		$upload_output = Upload::upload_file($file['file_upload'],$photo['owner']);
 
-				  		if($upload_output['failed'] == false)
-				  		{
-
 				  			$sql = "INSERT INTO photos (title,name,date,description,file,owner) VALUES (:title,:name,:date,:description,:file,:owner)";
 
 				  			$data = array(':title'        => $photo['title'],
@@ -195,16 +195,9 @@ class Photo {
 
 				  			Upload::close();
 
-				  			$upload_output += array( 'target' => $target);
+				  			//$upload_output += array( 'target' => $target);
 
 				  			return $upload_output;
-
-				  		} 
-				  		else
-				  		{
-				  			return $upload_output;	
-				  		} 
-
 
 				}
 				else
@@ -225,20 +218,19 @@ class Photo {
 
 	  		$output = Upload::upload_file($photo['file'],$photo['owner']);
 
-	  		if($output['failed'] == false)
+	  		try
 	  		{
 	  			$sql = "UPDATE photos SET name=".Upload::get_user_file_name()." file=".Upload::get_generated_file_name()."WHERE id=".$this->id;
 	  			Request::execute($sql);
 
 	  			Upload::close();
 
-	  			return array('failed' => false, 'error' => "");
 	  		}
-	  		else
+	  		catch (UploadException $e)
 	  		{
 	  			Upload::close();
 	  			
-	  			throw new UploadException('could not delete picture from the server, try again later');
+	  			throw new UploadException();
 	  		}
 	  }
 
@@ -405,7 +397,7 @@ class Photo {
 					$sql = "SELECT * FROM photos p WHERE date>:key"; 					
 					$data = array(':key' => $arg1);
 
-					$type_format['failed'] = false;
+					
 				}
 				else
 				{
