@@ -8,7 +8,7 @@ class NotFoundException extends Exception {
   public function errorMessage() {
 
     //error message
-    $errorMsg = 'Error on line '.$this->getLine().' in '.$this->getFile().' '.$message.''.$this->getMessage().'</b> ';
+    $errorMsg = 'Error on line '.$this->getLine().' in '.$this->getFile().' '. self::message .''.$this->getMessage().'</b> ';
     
     return $errorMsg;
   }
