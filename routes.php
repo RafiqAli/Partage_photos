@@ -38,6 +38,7 @@ $controllers = array( 'pages'   => ['home',
                                     'addPhoto',
                                     'modifyPhoto',
                                     'addToFavorite',
+                                    'getPhotoById',
                                     'getInfosByImage',
                                     'search',
                                     'notePhoto']

@@ -162,6 +162,28 @@ class ApiController
 	}
 	/////////////////////////////////////////////////////////////
 
+
+	public function getPhotoById()
+	{
+		require_once('../Models/Photo.php');
+
+		try
+		{
+			$photo = Photo::find($_GET['id']);
+			
+			$response = json_encode($photo);
+		}
+		catch (Exception $e) 
+		{
+			$response = '{ "exception": "'.($e->simpleError()).'" } ';
+
+			$response = json_encode($response);
+		}
+
+		echo $response;
+	}
+
+
 	//Renvoie les infos d'une image et ses commentaires
 	public function getInfosByImage()
 	{
