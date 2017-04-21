@@ -7,30 +7,36 @@ require_once("core/Enumeration.php");
 
 
 
-class Category
+class LocalArea
 {
 
-	const ALL = 0;
+	const COUNTRY = 1;
+	const CITY    = 2;
+	const STREET  = 3;
 
 	public $id;
-	public $name;
-	public $description;
-	public $photo_id;
+	public $street;
+	public $city;
+	public $country;
 
-	public function __construct($id = null,$name,$description,$photo_id)
+	public function __construct($id = null,$street,$city,$country)
 	{
-		if(Regex::validate(Regex::NAME,$name) 
-			&& Regex::validate(Regex::RICHTEXT,$description) 
-				&& Regex::validate(Regex::DIGITS,$photo_id)
+		if(Regex::validate(Regex::RICHTEXT,$street) 
+			&& Regex::validate(Regex::NAME,$city) 
+				&& Regex::validate(Regex::NAME,$country)
 					&& ($id == null || Regex::validate(Regex::DIGITS,$id)))
 		{
 			 $this->id = $id;
-			 $this->name = $name;
-			 $this->description = $description;
-			 $this->photo_id = $photo_id;
+			 $this->street = $street;
+			 $this->city = $city;
+			 $this->country = $country;
 		}
 
 	}
+
+
+
+
 
 	public static function find($id)
 	{
@@ -38,29 +44,30 @@ class Category
   		if(Regex::validate(Regex::DIGITS,$id))
   		{
 
-      		$sql = "SELECT * FROM categories WHERE id=".$id;
+      		$sql = "SELECT * FROM local_areas WHERE id=".$id;
 
-      		$category = Request::execute($sql);
+      		$local_area = Request::execute($sql);
 
-      		if($category != null)
+      		if($local_area != null)
       		{
 
-      			$category = $category[0];
+      			$local_area = $local_area[0];
 
-	      		$category_instance = new Category($category['id'],$category['name'],$category['description'],$category['photo_id']);
+	      		$local_area_instance = new local_area($local_area['id'],$local_area['street'],$local_area['city'],$local_area['country']);
 
-	      		return array('failed' => false, 'object' => $category_instance, 'error' => '');
+	      		return $local_area_instance;
 
       		}
       		else
       		{
-      			return array('failed' => true, 'error' => 'we couldn\'t find a category with this id value');
+      			throw new NotFoundException("we couldn't find a local area with this id value");
+      			  
       		}
 
       	}
       	else
       	{
-      		return array('failed' => true, 'error' => 'please enter a numeric value for the id');
+      		throw new InvalidFormatException("please enter a numeric value for the id");
       	}
 
 
@@ -71,52 +78,104 @@ class Category
 
 	  	$list = [];
 
-		$sql = "SELECT * FROM categories";
+		$sql = "SELECT * FROM local_areas";
 
 		$output = Request::execute($sql);
 
 		if($output != null)
 		{
 
-		  	foreach ($output as $category) {
+		  	foreach ($output as $local_area) {
 		  		
-		  		$list[] = new category($category['id'],$category['name'],$category['description'],$category['photo_id']);
+		  		$list[] = new local_area($local_area['id'],$local_area['street'],$local_area['city'],$local_area['country']);
 		  	}
 
-		  	return  array('failed' => false, 'objects' => $list, 'error' => '');
+		  	return  $list;
 	    }
 	    else
 	    {
-	    	return array('failed' => true, 'error' => 'coudn\'t find categories on database');
+	    	throw new NotFoundException("we coudn't find local areas on database");
 	    }
 
 	}
 
-	public static function create($category)
+
+	public static function search($type,$key)
 	{
 
-		if(Regex::validate(Regex::NAME,$name) 
-			&& Regex::validate(Regex::RICHTEXT,$description) 
-				&& Regex::validate(Regex::DIGITS,$photo_id)
-					&& ($id == null || Regex::validate(Regex::DIGITS,$id)))
-		{		
+		if(Regex::validate(Regex::DIGITS,$type)
+			&& Regex::validate(Regex::RICHTEXT,$key))
+		{
+			switch ($type) {
 
-			$sql = "INSERT INTO categories (name,description,photo_id) VALUES (:name,:description,:photo_id)";
+				case LocalArea::COUNTRY : $sql = "SELECT * FROM photos p JOIN local_area la ON (p.local_area_id = la.id) WHERE la.country LIKE :key ";
+					$data = array(':key' => "%" . $key . "%");
+				break;
 
-		 	$data = array(':name' => $category['name'], 'description' => $category['description'], 'photo_id' => $category['photo_id']);
+				case LocalArea::CITY    : $sql = "SELECT * FROM photos p JOIN local_area la ON (p.local_area_id = la.id) WHERE la.city LIKE :key "; 	
+					$data = array(':key' => "%" . $key . "%");
+				break;
 
-		 	$output = Request::execute($sql,$data);
+				case LocalArea::STREET  : $sql = "SELECT * FROM photos p JOIN local_area la ON (p.local_area_id = la.id) WHERE la.street LIKE :key ";
+					$data = array(':key' => "%" . $key . "%");
 
-		 	$category = new Category(Request::lastInsertId(),$category['name'],$category['description'],$category['photo_id']);
+				break;
+				
+				default:
+					
+					throw new EnumerationException('please make sure the value that you entered is defined as a constant in the core/Enumeration/Sort class.');
 
-		 	return array('failed' => false, 'object' => $category, 'error' => '');
+					break;
+			}
+
+
+			$photos = Request::execute($sql,$data,true);
+
+	  		if($photos != null)
+	  		{
+	  			$list_photos = [];
+
+				foreach ($photos as $photo)
+				{
+					$list_photos[] = new Photo($photo['id'],$photo['title'],$photo['name'],$photo['date'],
+											   $photo['description'],$photo['file'],$photo['owner']);
+				}
+
+				return  $list_photos;
+			}
+			else
+			{
+				throw new NotFoundException('No photo had been found on the database.');
+			}
+
 		}
 		else
 		{
-			return array('failed' => true, 'error' => 'please check the format of your fields');
+			throw new InvalidFormatException('please make sure you entered a valid numeric value.');
+		}
+	}
+
+	public static function create($local_area)
+	{
+		if(Regex::validate(Regex::RICHTEXT,$local_area['street']) 
+			&& Regex::validate(Regex::NAME,$local_area['city'])
+				&& Regex::validate(Regex::NAME,$local_area['country']))
+		{		
+
+			$sql = "INSERT INTO categories (street,city) VALUES (:street,:city)";
+
+		 	$data = array(':street' => $local_area['street'], 'city' => $local_area['city'], 'country' => $local_area['country']);
+
+		 	$output = Request::execute($sql,$data);
+
+		 	$local_area = new LocalArea(Request::lastInsertId(),$local_area['street'],$local_area['city'],$local_area['country']);
+
+		 	return  $local_area;
+		}
+		else
+		{
+			throw new InvalidFormatException("please check the format of your fields");
 		} 
-
-
 	}
 
 	public static function delete($id)
@@ -125,51 +184,47 @@ class Category
 		if(Regex::validate(Regex::DIGITS,$id))
 		{
 
-			$sql = "DELETE FROM categories WHERE id=$id";
+			$sql = "DELETE FROM local_areas WHERE id=$id";
 
 			$output = Request::query($sql);
 
-			return array('failed' => false, 'output' => $output, 'error' => '');
+			return  $output;
 		}
 		else
 		{
-			return array('failed' => true, 'error' => 'please enter a numeric value');
+			throw new InvalidFormatException('please enter a numeric value for the id');
 		}
 
 	}
 	
-	public function update_name($name)
+	public function update_street($street)
 	{
 
-	  	if(Regex::validate(Regex::NAME,$name))
+	  	if(Regex::validate(Regex::RICHTEXT,$street))
 	  	{
-	  		$sql = "UPDATE categories SET name = '".$name."' WHERE id = ".$this->id.";";
+	  		$sql = "UPDATE local_areas SET street = '".$street."' WHERE id = ".$this->id.";";
 
 	  		Request::query($sql);
-
-	  		return array('failed' => false, 'error' => '');
 	  	}
 	  	else
 	  	{
-	  		return array('failed' => true, 'error' => 'please make sure that you did enter a valid name');
+	  		throw new InvalidFormatException();
 	  	}
 
 	}
 
-	  public function update_description(string $description)
+	  public function update_city(string $city)
 	  {
 
-	  	if(Regex::validate(Regex::RICHTEXT,$description))
+	  	if(Regex::validate(Regex::NAME,$city))
 	  	{
-	  		$sql = "UPDATE categories SET description='".$description."' WHERE id=".$this->id;
+	  		$sql = "UPDATE local_areas SET city='".$city."' WHERE id=".$this->id;
 
 	  		Request::query($sql);
-
-	  		return array('failed' => false, 'error' => '');
 	  	}
 	  	else
 	  	{
-	  		return array('failed' => true, 'error' => 'please make sure that you did enter a valid description');
+	  		throw new InvalidFormatException();
 	  	}
 
 	  }	
@@ -193,11 +248,11 @@ class Category
 				$list_photos[] = new Photo($photo['id'],$photo['title'],$photo['name'],$photo['date'],$photo['description'],$photo['file'],$photo['owner']);
 			}
 
-			return array('failed' => false,'objects' => $list_photos, 'error' => '');
+			return $list_photos;
 		}
 		else
 		{
-			return array('failed' => true, 'error' => 'this category has no photos.');
+			throw new  NotFoundException("this category has no photos.");
 		}
 
 
@@ -205,9 +260,11 @@ class Category
 
 	public function __toString()
 	{
-		return "Category : [id] : ".$this->id."[name] : ".$this->name." [description] : ".$this->description." [photo_id]".$this->photo_id."\n";
+		return "Category : [id] : ".$this->id.", [name] : ".$this->name.", [description] : ".$this->description."\n";
 	}
 }
+
+
 
 
 
