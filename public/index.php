@@ -63,5 +63,13 @@
 
 
   $page_title = $action;
-  require_once('views/layout.php');
+  if ($controller == 'api')
+  {
+    require_once('views/layout_api.php');
+  }
+  else
+  {
+    require_once('views/layout.php');
+  }
 ?>
+
