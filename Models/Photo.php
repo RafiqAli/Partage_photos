@@ -482,7 +482,7 @@ class Photo {
 								   		   OR   r.description  LIKE :key";
 
 			
-			$data = array(':key' => '%' . $arg1 . '%');	
+			$data = array(':key' => "%" . $key . "%");	
 
 			$photos = Request::execute($sql,$data,true);
 
