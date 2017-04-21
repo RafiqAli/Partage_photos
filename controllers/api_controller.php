@@ -85,7 +85,7 @@ class ApiController
 				$response = " { 'success': 'Bienvenue!' } ";
 
 			}
-			catch(APIException $e)
+			catch(Exception $e)
 			{
 				$message = $e->getMessage();
 				$response = "{ 'exception': '$message' }";
@@ -104,7 +104,7 @@ class ApiController
 			$images = Photo::all();
 			$response = json_encode($images);
 		}
-		catch(APIException $e)
+		catch(Exception $e)
 		{
 			$message = $e->getMessage();
 			$response = "{ 'exception': '$message' }";
@@ -128,7 +128,7 @@ class ApiController
 				$images = $userInstance->photos();
 				$response = json_encode($images);
 			} 
-			catch (APIException $e) 
+			catch (Exception $e) 
 			{
 				$response = '{ "exception": "'.($e->getMessage()).'" } ';
 			}
@@ -182,7 +182,7 @@ class ApiController
 
 				$response = " {'infos': '$infos', 'comments': '$comments'} ";
 			} 
-			catch (APIException $e) 
+			catch (Exception $e) 
 			{
 				$response = '{ "exception": "'.($e->getMessage()).'" } ';
 			}
@@ -207,7 +207,7 @@ class ApiController
 		        $images = Photo::search($keywords);
 				$response = json_encode($images);
 			} 
-			catch (APIException $e) 
+			catch (Exception $e) 
 			{
 				$response = '{ "exception": "'.($e->getMessage()).'" } ';
 			}
