@@ -16,6 +16,9 @@
     <!-- Tags -->
     <link href="res/css/tags.css" rel="stylesheet">
 
+    <!-- jQuery UI CSS-->
+    <link href="../public/res/css/jquery-ui.min.css" rel="stylesheet">
+
     <!-- my style -->
     <link href="res/css/style.css" rel="stylesheet" type="text/css">
 
@@ -28,6 +31,22 @@
     <!-- Tags -->
     <script src="res/js/tags.js"></script>
 
+    <!-- jQuery UI-->
+    <script src="../public/res/js/jquery-ui.min.js"></script>
+
+
+    <!-- START : Added to fix a bootstrap modal problem  -->
+
+    <style type="text/css">
+        
+        body.modal-open div.modal-backdrop { 
+            z-index: 0; 
+        }
+    </style>
+
+    <!--  see : https://goo.gl/f9eRjY -->
+
+    <!-- END :  Added to fix a bootstrap modal problem -->
     
   </head>
 
