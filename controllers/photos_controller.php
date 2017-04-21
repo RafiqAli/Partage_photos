@@ -1,4 +1,5 @@
 <?php
+
   class PhotosController 
   {
 
@@ -63,12 +64,22 @@
           require_once('../public/views/elements/navbar.php');
           require_once('views/photos/affiche_photo.php'); 
         }
-        catch (Exception $e)
+        catch (NotFoundException $e)
         {
-          $_SESSION['error'] = $e->getMessage();
+          //$_SESSION['error'] = $e->getMessage();
           require_once('../public/views/elements/navbar.php');
-          require_once('views/pages/home.php'); 
+          require_once('views/photos/affiche_photo.php'); 
+          //require_once('views/pages/home.php'); 
         }
+        catch (Exception $ee)
+        {
+
+        $_SESSION['error'] = $e->getMessage();
+        require_once('../public/views/elements/navbar.php');
+        require_once('views/pages/home.php');
+          
+        }
+
       }
       else
       {
@@ -124,9 +135,67 @@
         if(isset($_POST['submit_recherche']))
         {
           $mot_cle = test_input($_POST['mot_cle']);
-          $images = Photo::search($mot_cle);
+          $images = Photo::neo_search_text($mot_cle);
           require_once('../public/views/elements/navbar.php');
           require_once('views/photos/recherche.php'); 
+        }
+
+      }
+      catch (Exception $e)
+      {
+        $_SESSION['error'] = $e->getMessage();
+        require_once('../public/views/elements/navbar.php');
+        require_once('views/pages/home.php'); 
+      }
+    }
+
+
+
+    public function cherche_photo_par_date()
+    {
+      try
+      {
+
+        if(isset($_POST['submit_search_date']))
+        {
+
+          if($_POST['search_date_type'] == Search::BEFORE_DATE)
+          {
+
+            $before_date = test_input($_POST['before_date']);
+            $images = Photo::neo_search_date(Search::BEFORE_DATE,$before_date);
+
+            require_once('../public/views/elements/navbar.php');
+            require_once('views/photos/recherche.php'); 
+
+          }
+          else if ($_POST['search_date_type'] == Search::AFTER_DATE)
+          {
+
+            $after_date = test_input($_POST['after_date']);
+            $images = Photo::neo_search_date(Search::AFTER_DATE,$after_date);
+
+            require_once('../public/views/elements/navbar.php');
+            require_once('views/photos/recherche.php'); 
+
+          }
+          else if ($_POST['search_date_type'] == Search::BETWEEN_DATES)
+          {
+
+            $between_dates_1 = $_POST['between_dates_one'];
+            $between_dates_2 = $_POST['between_dates_two'];
+
+            $images = Photo::neo_search_date(Search::BETWEEN_DATES,$between_dates_1,$between_dates_2);
+
+            require_once('../public/views/elements/navbar.php');
+            require_once('views/photos/recherche.php'); 
+
+          }
+          else
+          {
+              throw new EnumerationException();
+          }
+
         }
 
       }

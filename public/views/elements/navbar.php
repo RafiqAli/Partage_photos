@@ -36,6 +36,8 @@
           <input type="search" class="form-control" placeholder="Rechercher" name="mot_cle">
         </div>
         <input type="submit" name="submit_recherche" class="btn btn-primary btn-sm" value="chercher" />
+        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal">chercher par date</button>
+
       </form>
 
       <ul class="nav navbar-nav navbar-right">
@@ -72,4 +74,157 @@
       </ul>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
+
+
+
+
+<!--  Recherche par date -->
+
+  <?php require_once($_SERVER['DOCUMENT_ROOT']."/core/Enumerations.php"); ?>
+
+
+  <!-- Modal -->
+  <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Recherche par date</h4>
+        </div>
+        <div class="modal-body">
+          
+
+
+      <div id="accordion">
+
+        <h3>Avant une date</h3>
+        <div>
+          <div class="container-fluid">
+            <div class="row">
+             
+              <!-- Before date form -->
+
+              <form class="navbar-form navbar-left" method="post" action="?controller=photos&action=cherche_photo_par_date">
+              
+                <!-- Hidden input to identify the type of the sort -->
+                <input type="hidden" name="search_date_type" value="<?= Search::BEFORE_DATE ?>" >
+                
+                <div class="col-md-8 col-sm-8">
+                  <input type="date" class="form-control" name="before_date">
+                </div>
+                <div class="col-md-4 col-sm-4">
+                  <input type="submit" name="submit_search_date" class="btn btn-info btn-sm" value="Valider">
+                </div>
+              </form>
+
+              <!-- Before date form -->
+
+            </div>
+          </div>
+        </div>
+
+        <h3>Après une date</h3>
+
+        <div>
+          <div class="container-fluid">
+            <div class="row">
+
+              <!-- Before date form -->
+
+              <form class="navbar-form navbar-left" method="post" action="?controller=photos&action=cherche_photo_par_date">
+               
+                  <!-- Hidden input to identify the type of the sort -->
+                <input type="hidden" name="search_date_type" value="<?= Search::AFTER_DATE ?>" >
+
+                <div class="col-md-8 col-sm-8">
+                  <input type="date" class="form-control" name="after_date">
+                </div>
+                <div class="col-md-4 col-sm-4">
+                  <input type="submit" name="submit_search_date" class="btn btn-info btn-sm" value="Valider">
+                </div>
+              
+              </form>
+              
+              <!-- end after date form -->
+
+            </div>
+          </div>
+        </div>
+
+        <h3>Entre deux dates</h3>
+        <div>
+
+
+                     
+          <div class="container-fluid">
+
+              <!-- Before date form -->
+   
+              <div class="row">
+
+                 <form class="navbar-form navbar-left" method="post" action="?controller=photos&action=cherche_photo_par_date">
+
+
+                <table>
+                <tr>
+                    <!-- Hidden input to identify the type of the sort -->
+                  <td><input type="hidden" name="search_date_type" value="<?= Search::BETWEEN_DATES ?>" ></td>
+                  <td><label style="padding-top: 5px;" >Entre &nbsp;</label></td>
+                  <td><input type="date" class="form-control" name="between_dates_one"></td>
+                  <td><label style="padding-top: 5px;">&nbsp; &nbsp; et &nbsp; &nbsp; </label></td>
+                  <td><input type="date" class="form-control" name="between_dates_two"></td>
+                </tr>
+
+                <tr>
+                  <td colspan="5">
+                    <center><input type="submit"  name="submit_search_date" class="btn btn-info btn-sm" value="Valider" style="margin-top: 10px;"></center>
+                  </td>
+                </tr>
+
+              </table>
+
+              </form>
+              </div>
+
+              <!-- end between dates form -->
+
+            </div>
+
+          </div>
+
+         
+
+        </div>
+
+      </div>
+
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+
+
+    <script>
+/*      $( function() {
+        $( "#accordion" ).accordion();
+      } );*/
+
+    $(function() { $("#accordion").accordion({
+     heightStyle: "content",
+     autoHeight: false,
+     clearStyle: true
+      });
+    });
+
+      </script>
+
+
 </nav>

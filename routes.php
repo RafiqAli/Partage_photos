@@ -23,6 +23,7 @@ $controllers = array( 'pages'   => ['home',
                                     'affiche_photo',
                                     'modif_photo',
                                     'cherche_photo',
+                                    'cherche_photo_par_date',
                                     'neo_search'],
 
                       'groups'  => ['my_groups',
@@ -68,6 +69,7 @@ function call($controller, $action)
       require_once('Models/Photo.php');
       require_once('Models/User.php');
       require_once('Models/Comment.php');
+      require_once('core/Enumerations.php');
 
       $controller = new PhotosController();
     break;
