@@ -80,7 +80,7 @@
 
 <!--  Recherche par date -->
 
-  <?php require_once($_SERVER['DOCUMENT_ROOT']."/core/Enumerations.php"); ?>
+  <?php require_once($_SERVER['DOCUMENT_ROOT']."/Partage_photos/core/Enumerations.php"); ?>
 
 
   <!-- Modal -->

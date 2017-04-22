@@ -10,7 +10,7 @@
                 </h1>
                 <ol class="breadcrumb">
                     <li class="active">
-                         Veuillez vous connecter pour s'authentifier !
+                         Veuillez vous connecter pour continuer !
                     </li>
                 </ol>
                 </div>

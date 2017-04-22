@@ -14,7 +14,7 @@ if (isset($_SESSION['error'])) {
 	unset($_SESSION['error']);
 
 }
-else if (isset($_SESSION['success'])) {
+if (isset($_SESSION['success'])) {
 ?>
 
 	<div class="alert alert-success alert-dismissible text-center" role="alert">
@@ -27,7 +27,7 @@ else if (isset($_SESSION['success'])) {
 
 	unset($_SESSION['success']);
 }
-else if (isset($_SESSION['info'])) {
+if (isset($_SESSION['info'])) {
 ?>
 
 	<div class="alert alert-info alert-dismissible text-center" role="info">
