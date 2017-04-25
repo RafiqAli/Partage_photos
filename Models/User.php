@@ -22,12 +22,15 @@ class User {
 
 	public $password;
 
+	public $api_key;
+
 	//const PATH_TO_PHOTOS = "/media/ali/New Volume/Study/4iéme année/S1/PHP/Partage_photos/public/ressources/users/";
 
-	private function __construct($login,$password) {
+	private function __construct($login,$password,$api_key = null) {
 
-		$this->login = $login;
+		$this->login    = $login;
 		$this->password = $password;
+		$this->api_key  = api_key;
 	}
 
 	public static function all() {
@@ -155,9 +158,11 @@ class User {
 		if(Regex::validate(Regex::NAME,$user['login']) && $user['password'] != null)
 		{
 
-		 	$sql = "INSERT INTO users () VALUES (:login,:password)";
+		 	$sql = "INSERT INTO users (login,password,api_key) VALUES (:login,:password,:api_key)";
 
-		 	$data = array(':login' => $user['login'], 'password' => sha1($user['password']));
+		 	$data = array(':login' => $user['login'],
+		 				  'password' => sha1($user['password']),
+		 				  'api_key' => md5(uniqid($user['login'], true)));
 
 		 	$output = Request::execute($sql,$data);
 
