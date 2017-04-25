@@ -41,7 +41,10 @@ $controllers = array( 'pages'   => ['home',
                                     'getPhotoById',
                                     'getInfosByImage',
                                     'search',
-                                    'notePhoto']
+                                    'notePhoto'],
+
+                 'api_photo_io' => ['insert_photo',
+                                     'get_photo']
                      );
 
 
@@ -49,6 +52,7 @@ $controllers = array( 'pages'   => ['home',
 
 function call($controller, $action) 
 {
+
   require_once('controllers/' . $controller . '_controller.php');
 
   switch($controller) 
@@ -89,11 +93,18 @@ function call($controller, $action)
       $controller = new ApiController();
     break;
 
+    case 'api_photo_io':
+
+      $controller = new APIPhotoIOController();
+
+    break;
+    
+
   }
 
 //---------------------------------------------------------------------------
 
-  $controller->{ $action }();
+  $controller-> { $action }();
 
 }
 

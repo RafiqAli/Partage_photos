@@ -1,8 +1,13 @@
 <?php
 
-require_once("APIHelper.php");
+require_once("api_helper.php");
 
-class APIPhotoIO
+require_once($_SERVER['DOCUMENT_ROOT']."/Models/Photo.php");
+
+require_once($_SERVER['DOCUMENT_ROOT']."/Exceptions/JSONException.php");
+
+
+class APIPhotoIOController
 {
 
 
@@ -16,11 +21,11 @@ public static function insert_photo()
 
 		// make sure the attributes login and api_key exists
 		if(!(isset($headers['login']) || isset($headers['api_key']))) 
-					throw new UnauthorizedAccessException("undefined login and api_key attributes");
+					throw new UnAuthorizedAccessException("undefined login and api_key attributes");
 
 		// making sure they contains a not empty value
 		if(empty($headers['login']) || empty($headers['api_key'])) 
-					throw new UnauthorizedAccessException("empty login or api_key field");
+					throw new UnAuthorizedAccessException("empty login or api_key field");
 
 		// try to gain access
 		$login    = $headers['login'];
@@ -101,54 +106,42 @@ public static function insert_photo()
 
 
 		$message = 'your photo is now on our server';
-		return json_encode("{ state: 'success',message: '$message'}");
+		echo json_encode("{ state: 'success',message: '$message'}");
 
 	}
-	catch (UnauthorizedAccessException $uae)
+	catch (UnAuthorizedAccessException $uae)
 	{
 		$exception = $uae->simpleError();
-		return json_encode("{ 'exception': '$exception' }");	
+		echo json_encode("{ 'exception': '$exception' }");	
 	}
 	catch(JSONException $je)
 	{
 		$exception = $uae->simpleError();
-		return json_encode("{ 'exception': '$exception' }");		
-	}
-	catch(SQLExcption $sql_e)
-	{
-		$exception = $uae->simpleError();
-		return json_encode("{ 'exception': '$exception' }");
+		echo json_encode("{ 'exception': '$exception' }");		
 	}
 	catch(ServerFileOperationException $foe)
 	{
 		$exception = $foe->simpleError();
-		return json_encode("{ 'exception': '$exception' }");
+		echo json_encode("{ 'exception': '$exception' }");
 	}
 	catch (PDOException $pdoe)
 	{	 
 		$exception = "There were an internal error while inserting this picture on the model";
-		return json_encode("{ 'exception': '$exception' }");
+		echo json_encode("{ 'exception': '$exception' }");
 	}
 	catch(Exception $e)
 	{
 		$exception = $e->simpleError();
-		return json_encode("{ 'exception': '$exception' }");
+		echo json_encode("{ 'exception': '$exception' }");
 	}
 
 }
 
-//print_r(getallheaders());
 
-
-
-
-
-public static function get_photo($id)
+public static function get_photo($id = null)
 {
-
 	try
 	{
-
 
 		// make sure the attributes login and api_key exists
 		if(!(isset($_GET['login']) || isset($_GET['api_key']))) 
@@ -158,21 +151,28 @@ public static function get_photo($id)
 		if(empty($_GET['login']) || empty($_GET['api_key'])) 
 					throw new UnauthorizedAccessException("empty login or api_key field");
 
+		// we check if the id argument is defined so we could retreive the photo by id
+		if(isset($_GET['id']) && $id = null ) throw new NullOrUnsetException("The id argument is not defined");
+		
 		// try to gain access
 		$login    = $_GET['login'];
 		$password = $_GET['api_key'];
 
 		APIHelper::gain_access($login,$password);
 
+		// extract the id from the not null variable either by GET or function argument
+		if ($_GET['id'] != null) $photo_id = $_GET['id'];
+		else $photo_id = $id; 
+
 		// call the find method to get photos attributes
-		$photo = Photo::find($id);
+		// this method throws InvalidFormatException and 
+		// NotFoundException
+		$photo = Photo::find($photo_id);
 
 		// get the path of the image
-		
 		$path_to_photo =  $_SERVER['DOCUMENT_ROOT']."/public/res/users/". $photo->owner . '/' . $photo->file;
 
 		// get the data from the file
-		
 		$photo_data = file_get_contents($path_to_photo);
 
 		if ($photo_data == false) throw new ServerFileOperationException("could not read from photo file.");
@@ -185,42 +185,43 @@ public static function get_photo($id)
 		$photo_array = (array) $photo;
 
 		//inject it in photo array
-		$photo_array['base64_photo'] = $encoded_photo;
+		$photo_array['base64'] = $encoded_photo;
 
 		// transform the associative array to JSON with the json_encode function
-		return json_encode($photo_array);
+		echo json_encode($photo_array);
 	
 	}
 	catch (UnauthorizedAccessException $uae)
 	{
 		$exception = $uae->simpleError();
-		return json_encode("{ 'exception': '$exception' }");	
+		echo json_encode("{ 'exception': '$exception' }");	
 	}
 	catch (NotFoundException $nfe)
 	{
 		$exception = $nfe->simpleError();
 
-		return json_encode("{ 'exception': '$exception' }");
+		echo json_encode("{ 'exception': '$exception' }");
+	}
+	catch (InvalidFormatException $nfe)
+	{
+		$exception = $nfe->simpleError();
+
+		echo json_encode("{ 'exception': '$exception' }");
 	}
 	catch(ServerFileOperationException $foe)
 	{
 		$exception = $foe->simpleError();
-		return json_encode("{ 'exception': '$exception' }");
+		echo json_encode("{ 'exception': '$exception' }");
 	}
 	catch (PDOException $pdoe)
 	{	 
 		$exception = "There were an internal error while fetching data from database";
-		return json_encode("{ 'exception': '$exception' }");
+		echo json_encode("{ 'exception': '$exception' }");
 	}
 
-
 }
 
 }
-
-
-
-//file_put_contents('image.jpg',base64_decode(json_decode(file_get_contents('php://input'))->base64_photo));
 
 
 ?>

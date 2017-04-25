@@ -8,7 +8,9 @@
   require_once('../controllers/functions.php');
 
 
-  if(isset($_GET['controller']) && $_GET['controller'] == 'api')  //API CONTROLLER
+
+
+  if(isset($_GET['controller']) && ($_GET['controller'] == 'api'|| $_GET['controller']  == 'api_photo_io'))  //API CONTROLLER
   {
     $controller = $_GET['controller'];
     $action = $_GET['action'];
@@ -16,6 +18,7 @@
 
   else //WEBSITE CONTROLLER
   {
+
     if (isset($_SESSION['user'])) //USER SESSION IS SET
     {
       if (isset($_GET['controller']) && isset($_GET['action'])) //USER SET AND CONTROLLER SET
@@ -63,7 +66,8 @@
 
 
   $page_title = $action;
-  if ($controller == 'api')
+
+  if ($controller == 'api' || $controller == 'api_photo_io')
   {
     require_once('views/layout_api.php');
   }
