@@ -203,12 +203,12 @@ class Upload {
 
 
      
-    private static function upload_dir($destination) 
+    public static function upload_dir($destination) 
     { 
 
     	$failed = false;
     	$error = "";
-    	$target = $_SERVER['DOCUMENT_ROOT']."/Partage_photos/".self::LOCAL_TARGET . $destination;
+    	$target = $_SERVER['DOCUMENT_ROOT']."/".self::LOCAL_TARGET . $destination;
 
     	if(file_exists($target))
     	{
@@ -226,6 +226,8 @@ class Upload {
 	        {
 	        	$failed = true; 
 	         	$error  = 'Could not create directory for file storage in --> '.$target; 
+
+	         	throw new ServerFileOperationException('Could not create directory for file storage--> '.$target);
 	        }
 		}
 
